@@ -1,0 +1,10 @@
+# グラフ本体(約280MB、manifest.csvのS3 URLから再取得可能)
+data/batch/
+data/*.json
+!data/circuits.json
+!data/feature_explanations.json
+
+# ログ・一時ファイル
+gen.log
+__pycache__/
+*.pyc

@@ -1,0 +1,69 @@
+slug,category,prompt,expected,s3url,numNodes,numLinks
+agpoc-a00-hj328,A,The capital of France is,paris,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a00-hj328-1781093756904.json,1088,54382
+agpoc-a01-hj328,A,The capital of Japan is,tokyo,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a01-hj328-1781093771691.json,1048,48109
+agpoc-a02-hj328,A,The capital of Italy is,rome,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a02-hj328-1781093787658.json,1059,53773
+agpoc-a03-hj328,A,The capital of Germany is,berlin,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a03-hj328-1781093802274.json,1060,51563
+agpoc-a04-hj328,A,The capital of Spain is,madrid,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a04-hj328-1781093816922.json,1057,52119
+agpoc-a05-hj328,A,The capital of Russia is,moscow,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a05-hj328-1781093845785.json,1075,55148
+agpoc-a06-hj328,A,The capital of China is,beijing,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a06-hj328-1781093859824.json,1039,48991
+agpoc-a07-hj328,A,The capital of Egypt is,cairo,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a07-hj328-1781093875949.json,1066,46922
+agpoc-a08-hj328,A,The capital of Canada is,ottawa,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a08-hj328-1781093889719.json,1010,40568
+agpoc-a09-hj328,A,The capital of Australia is,canberra,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-a09-hj328-1781093903149.json,1012,40665
+agpoc-b10-hj328,B,The capital of Atlantis is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b10-hj328-1781093922117.json,1134,50470
+agpoc-b11-hj328,B,The capital of the Moon is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b11-hj328-1781093957259.json,1179,46998
+agpoc-b12-hj328,B,The capital of Narnia is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b12-hj328-1781093973301.json,1237,55121
+agpoc-b13-hj328,B,The king of the United States is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b13-hj328-1781093989392.json,1108,43414
+agpoc-b14-hj328,B,The fourth side of the triangle is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b14-hj328-1781094007992.json,1305,65447
+agpoc-b15-hj328,B,The capital of the Pacific Ocean is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b15-hj328-1781094025209.json,1338,60182
+agpoc-b16-hj328,B,The president of Antarctica is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b16-hj328-1781094042327.json,990,35067
+agpoc-b17-hj328,B,The national language of Mars is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b17-hj328-1781094055083.json,1293,53332
+agpoc-b18-hj328,B,The queen of Texas is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b18-hj328-1781094076085.json,1028,44205
+agpoc-b19-hj328,B,The capital of the number seven is,,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-b19-hj328-1781094089893.json,1230,43403
+agpoc-c21-hj328,C,Fact: The capital of the state containing Miami is,tallahassee,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c21-hj328-1781094164026.json,1489,59023
+agpoc-c22-hj328,C,Fact: The capital of the state containing Chicago is,springfield,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c22-hj328-1781094184689.json,1576,66671
+agpoc-c23-hj328,C,Fact: The capital of the state containing Seattle is,olympia,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c23-hj328-1781094203199.json,1485,53218
+agpoc-c24-hj328,C,Fact: The capital of the state containing Philadelphia is,harrisburg,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c24-hj328-1781094220433.json,1544,63094
+agpoc-c25-hj328,C,Fact: The capital of the state containing Los Angeles is,sacramento,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c25-hj328-1781094237876.json,1530,58972
+agpoc-c26-hj328,C,Fact: The capital of the state containing Las Vegas is,carson,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c26-hj328-1781094255168.json,1617,66183
+agpoc-c27-hj328,C,Fact: The capital of the state containing Memphis is,nashville,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c27-hj328-1781094273288.json,1554,65252
+agpoc-c28-hj328,C,Fact: The capital of the state containing Detroit is,lansing,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c28-hj328-1781130626047.json,1484,53224
+agpoc-c20-hj328,C,Fact: The capital of the state containing Dallas is,austin,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c20-hj328-1781094108538.json,1490,55645
+agpoc-c29-hj328,C,Fact: The capital of the state containing Baltimore is,annapolis,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-c29-hj328-1781130700227.json,1523,64743
+agpoc-d30-hj328,D,The opposite of hot is,cold,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d30-hj328-1781130732364.json,960,30922
+agpoc-d31-hj328,D,The opposite of big is,small|little,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d31-hj328-1781130761065.json,921,27503
+agpoc-d32-hj328,D,The opposite of up is,down,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d32-hj328-1781130790857.json,858,23964
+agpoc-d33-hj328,D,The opposite of fast is,slow,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d33-hj328-1781130818991.json,959,32025
+agpoc-d34-hj328,D,The opposite of dark is,light|bright,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d34-hj328-1781130848992.json,954,29444
+agpoc-d35-hj328,D,The opposite of happy is,sad|unhappy,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d35-hj328-1781130876513.json,1088,51677
+agpoc-d36-hj328,D,The opposite of old is,young|new,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d36-hj328-1781130905062.json,920,27688
+agpoc-d37-hj328,D,The opposite of wet is,dry,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d37-hj328-1781130932973.json,957,25976
+agpoc-d38-hj328,D,The opposite of hard is,soft|easy,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d38-hj328-1781130966629.json,912,25021
+agpoc-d39-hj328,D,The opposite of tall is,short,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-d39-hj328-1781130993564.json,1064,40455
+agpoc-f40-hj328,F,Fact: The capital of France is,paris,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f40-hj328-1781131023448.json,1374,58644
+agpoc-f41-hj328,F,Fact: The capital of Japan is,tokyo,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f41-hj328-1781131054308.json,1306,49983
+agpoc-f42-hj328,F,Fact: The capital of Italy is,rome,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f42-hj328-1781131087201.json,1328,53343
+agpoc-f43-hj328,F,Fact: The capital of Germany is,berlin,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f43-hj328-1781131118798.json,1351,58484
+agpoc-f44-hj328,F,Fact: The capital of Spain is,madrid,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f44-hj328-1781131149742.json,1324,54960
+agpoc-f45-hj328,F,Fact: The capital of Russia is,moscow,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f45-hj328-1781131183530.json,1362,56518
+agpoc-f46-hj328,F,Fact: The capital of China is,beijing,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f46-hj328-1781131218149.json,1292,46970
+agpoc-f47-hj328,F,Fact: The capital of Egypt is,cairo,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f47-hj328-1781131250388.json,1333,49299
+agpoc-f48-hj328,F,Fact: The capital of Canada is,ottawa,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f48-hj328-1781131281921.json,1246,45099
+agpoc-f49-hj328,F,Fact: The capital of Australia is,canberra,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-f49-hj328-1781131312745.json,1281,46363
+agpoc-e50-hj328,E,Two plus three equals,five|5,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e50-hj328-1781131345405.json,1126,55661
+agpoc-e51-hj328,E,Four plus four equals,eight|8,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e51-hj328-1781131373490.json,1082,50587
+agpoc-e52-hj328,E,Six plus one equals,seven|7,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e52-hj328-1781131403713.json,1045,42269
+agpoc-e53-hj328,E,Five plus two equals,seven|7,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e53-hj328-1781131430997.json,1087,46573
+agpoc-e54-hj328,E,Three plus three equals,six|6,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e54-hj328-1781131461158.json,1092,51248
+agpoc-e55-hj328,E,Nine plus one equals,ten|10,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e55-hj328-1781131489148.json,1149,55026
+agpoc-e56-hj328,E,Seven plus two equals,nine|9,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e56-hj328-1781131520750.json,1144,56085
+agpoc-e57-hj328,E,One plus five equals,six|6,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e57-hj328-1781165992694.json,1080,46224
+agpoc-e58-hj328,E,Eight plus two equals,ten|10,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e58-hj328-1781166026757.json,1110,52725
+agpoc-e59-hj328,E,Four plus three equals,seven|7,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-e59-hj328-1781166056185.json,1062,46501
+agpoc-g60-hj328,G,France's capital city is,paris,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-g60-hj328-1781166962638.json,1268,69151
+agpoc-g61-hj328,G,Japan's capital city is,tokyo,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-g61-hj328-1781166994598.json,1230,62377
+agpoc-g62-hj328,G,Germany's capital city is,berlin,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-g62-hj328-1781167025198.json,1254,65476
+agpoc-g63-hj328,G,Egypt's capital city is,cairo,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-g63-hj328-1781167056207.json,1289,63929
+agpoc-h64-hj328,H,The city that serves as the capital of France is,paris,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-h64-hj328-1781167089917.json,1440,73788
+agpoc-h65-hj328,H,The city that serves as the capital of Japan is,tokyo,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-h65-hj328-1781167124367.json,1415,70326
+agpoc-h66-hj328,H,The city that serves as the capital of Germany is,berlin,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-h66-hj328-1781167156430.json,1448,74231
+agpoc-h67-hj328,H,The city that serves as the capital of Egypt is,cairo,https://neuronpedia-attrib.s3.us-east-1.amazonaws.com/user-graphs/anonymous/agpoc-h67-hj328-1781167198420.json,1441,68916
