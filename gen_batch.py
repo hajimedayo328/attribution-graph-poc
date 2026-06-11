@@ -106,6 +106,19 @@ PROMPTS = [
     ("K", "Fact: The capital of Slovenia is", ["ljubljana"]),
     ("K", "Fact: The capital of Latvia is", ["riga"]),
     ("K", "Fact: The capital of Estonia is", ["tallinn"]),
+    # L: 逆方向(reversal curse検証。Kと同じ知識を逆から問う)
+    ("L", "Fact: The country whose capital is Ouagadougou is", ["burkina"]),
+    ("L", "Fact: The country whose capital is Astana is", ["kazakhstan"]),
+    ("L", "Fact: The country whose capital is Naypyidaw is", ["myanmar", "burma"]),
+    ("L", "Fact: The country whose capital is Thimphu is", ["bhutan"]),
+    ("L", "Fact: The country whose capital is Ulaanbaatar is", ["mongolia"]),
+    ("L", "Fact: The country whose capital is Antananarivo is", ["madagascar"]),
+    ("L", "Fact: The country whose capital is Montevideo is", ["uruguay"]),
+    ("L", "Fact: The country whose capital is Phnom Penh is", ["cambodia"]),
+    ("L", "Fact: The country whose capital is Bratislava is", ["slovakia"]),
+    ("L", "Fact: The country whose capital is Ljubljana is", ["slovenia"]),
+    ("L", "Fact: The country whose capital is Riga is", ["latvia"]),
+    ("L", "Fact: The country whose capital is Tallinn is", ["estonia"]),
 ]
 
 

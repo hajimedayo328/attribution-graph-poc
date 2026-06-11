@@ -47,7 +47,7 @@ def gini(values):
 
 def main() -> None:
     with open(MANIFEST, encoding="utf-8", newline="") as f:
-        manifest = [r for r in csv.DictReader(f) if r["category"] in ("F", "K")]
+        manifest = [r for r in csv.DictReader(f) if r["category"] in ("F", "K", "L")]
 
     rows = []
     for m in manifest:
@@ -84,7 +84,23 @@ def main() -> None:
             "nodes_per_token": G.number_of_nodes() / n_tok,
             "edges_per_token": G.number_of_edges() / n_tok,
         })
-        print(f"{m['slug']} {m['cat']} -> {token!r} correct={correct} p={rows[-1]['top1_prob']:.2f}")
+        print(f"{m['slug']} {m['category']} -> {token!r} correct={correct} p={rows[-1]['top1_prob']:.2f}")
+
+    # 方向比較: K(順方向: 国→首都) vs L(逆方向: 首都→国)
+    k_rows = [r for r in rows if r["cat"] == "K"]
+    l_rows = [r for r in rows if r["cat"] == "L"]
+    if l_rows:
+        print(f"\n===== 逆転の呪い: 順方向K({len(k_rows)}) vs 逆方向L({len(l_rows)}) =====")
+        print(f"K正答率: {sum(r['correct'] for r in k_rows)}/{len(k_rows)}")
+        print(f"L正答率: {sum(r['correct'] for r in l_rows)}/{len(l_rows)}")
+        keys_d = ["density", "gini", "modularity", "error_share", "nodes_per_token",
+                  "edges_per_token", "top1_prob", "entropy"]
+        print(f"{'指標':16s} {'K mean':>10s} {'L mean':>10s} {'p':>8s}")
+        for k in keys_d:
+            a = [r[k] for r in k_rows]
+            b = [r[k] for r in l_rows]
+            _, p = mann_whitney(a, b)
+            print(f"{k:16s} {sum(a)/len(a):10.3f} {sum(b)/len(b):10.3f} {p:8.4f}")
 
     cor = [r for r in rows if r["correct"]]
     inc = [r for r in rows if not r["correct"]]
