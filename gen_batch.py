@@ -93,6 +93,19 @@ PROMPTS = [
     ("H", "The city that serves as the capital of Japan is", ["tokyo"]),
     ("H", "The city that serves as the capital of Germany is", ["berlin"]),
     ("H", "The city that serves as the capital of Egypt is", ["cairo"]),
+    # K: 難問首都(2Bモデルが間違えやすいマイナー国。正誤で構造比較する幻覚実験用)
+    ("K", "Fact: The capital of Burkina Faso is", ["ouagadougou"]),
+    ("K", "Fact: The capital of Kazakhstan is", ["astana", "nur-sultan"]),
+    ("K", "Fact: The capital of Myanmar is", ["naypyidaw", "nay"]),
+    ("K", "Fact: The capital of Bhutan is", ["thimphu"]),
+    ("K", "Fact: The capital of Mongolia is", ["ulaanbaatar", "ulan"]),
+    ("K", "Fact: The capital of Madagascar is", ["antananarivo"]),
+    ("K", "Fact: The capital of Uruguay is", ["montevideo"]),
+    ("K", "Fact: The capital of Cambodia is", ["phnom"]),
+    ("K", "Fact: The capital of Slovakia is", ["bratislava"]),
+    ("K", "Fact: The capital of Slovenia is", ["ljubljana"]),
+    ("K", "Fact: The capital of Latvia is", ["riga"]),
+    ("K", "Fact: The capital of Estonia is", ["tallinn"]),
 ]
 
 
