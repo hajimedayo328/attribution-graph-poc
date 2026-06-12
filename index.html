@@ -50,6 +50,10 @@ header.site a.gh { font-size: var(--text-sm); white-space: nowrap; }
   border-top: var(--rule); padding-top: var(--space-lg);
 }
 .stats .stat .n { font-size: var(--text-2xl); font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.stats .stat:nth-child(1) .n { color: var(--color-blue); }
+.stats .stat:nth-child(2) .n { color: var(--color-purple); }
+.stats .stat:nth-child(3) .n { color: var(--color-green); }
+.stats .stat:nth-child(4) .n { color: var(--color-amber); }
 .stats .stat .l { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-xs); }
 
 section { padding: var(--space-xl) 0; border-top: var(--rule); }
@@ -61,10 +65,13 @@ section h2 {
 section .sub { color: var(--color-muted); margin-top: var(--space-sm); max-width: 60ch; }
 .finding {
   margin-top: var(--space-md); padding: var(--space-md);
-  background: var(--color-paper-2); border-radius: var(--radius);
+  background: var(--color-blue-soft); border-left: 4px solid var(--color-blue);
+  border-radius: var(--radius); box-shadow: var(--shadow-card);
   font-size: var(--text-base); max-width: 100%;
 }
 .finding b { font-weight: 650; }
+#phrasing .finding { background: var(--color-purple-soft); border-left-color: var(--color-purple); }
+#pr .finding { background: var(--color-amber-soft); border-left-color: var(--color-amber); }
 
 figure.chart { margin: var(--space-lg) 0 0; }
 figure.chart svg { width: 100%; height: auto; display: block; }
@@ -73,17 +80,24 @@ figure.chart figcaption { font-size: var(--text-sm); color: var(--color-muted); 
 .bar-value { font-size: 13px; fill: var(--color-ink); font-weight: 600; font-family: var(--font-mono); }
 .bar-muted { fill: var(--color-muted); }
 .axis-label { font-size: 12px; fill: var(--color-muted); font-family: var(--font-body); }
-.bar-main { fill: var(--color-accent); }
+.bar-main { fill: var(--color-blue); }
 .bar-base { fill: var(--color-subtle); }
 .bar-base2 { fill: oklch(80% 0.01 240); }
-.dot-generic { fill: var(--color-warn); opacity: 0.85; }
-.dot-content { fill: var(--color-accent); opacity: 0.85; }
-.dot-yes { fill: var(--color-ok); }
-.dot-no { fill: var(--color-warn); }
+#phrasing .bar-main { fill: var(--color-purple); }
+#phrasing .bar-base2 { fill: oklch(85% 0.04 70); }
+#universality .bar-main { fill: var(--color-blue); }
+#universality .bar-base2 { fill: var(--color-purple); }
+.dot-generic { fill: var(--color-red); opacity: 0.85; }
+.dot-content { fill: var(--color-blue); opacity: 0.85; }
+.dot-yes { fill: var(--color-green); }
+.dot-no { fill: var(--color-red); }
 .gridline { stroke: var(--color-subtle); stroke-width: 1; }
 
 .regimes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-md); margin-top: var(--space-lg); }
-.regime { border: var(--rule); border-radius: var(--radius); padding: var(--space-md); }
+.regime { border: var(--rule); border-radius: var(--radius); padding: var(--space-md); box-shadow: var(--shadow-card); }
+.regimes .regime:nth-child(1) { background: var(--color-green-soft); border-top: 3px solid var(--color-green); }
+.regimes .regime:nth-child(2) { background: var(--color-amber-soft); border-top: 3px solid var(--color-amber); }
+.regimes .regime:nth-child(3) { background: var(--color-red-soft); border-top: 3px solid var(--color-red); }
 .regime .tag { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-muted); }
 .regime h3 { font-size: var(--text-lg); margin-top: var(--space-sm); line-height: 1.4; }
 .regime p { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-sm); }
@@ -138,7 +152,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 </div>
 
 <section id="importance">
-  <h2>① 重要ノードの特定 — PageRankは「頭」にだけ効く</h2>
+  <h2>🎯 ① 重要ノードの特定 — PageRankは「頭」にだけ効く</h2>
   <p class="sub">circuit-tracerが因果計算で出す公式の重要度を、純粋なグラフ理論の指標だけでどこまで再現できるか(n=60)。</p>
   <figure class="chart">
     <svg viewBox="0 0 860 270" role="img" aria-label="重要度再現の比較: 順位相関と最重要top10一致数">
@@ -169,7 +183,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 </section>
 
 <section id="phrasing">
-  <h2>② 回路は内容ではなく「言い回し」を追う — ただし内容は局在していた</h2>
+  <h2>🔀 ② 回路は内容ではなく「言い回し」を追う — ただし内容は局在していた</h2>
   <p class="sub">同じ質問(○○の首都は?)を3つの言い回し×4カ国で生成し、回路の共有度(Jaccard類似度)を比較。</p>
   <figure class="chart">
     <svg viewBox="0 0 860 240" role="img" aria-label="言い回しvs内容のJaccard類似度比較(3スコープ)">
@@ -192,7 +206,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 </section>
 
 <section id="pr">
-  <h2>③ 答えは少数精鋭、無難な続きは物量 — 支持基盤の3倍差</h2>
+  <h2>📊 ③ 答えは少数精鋭、無難な続きは物量 — 支持基盤の3倍差</h2>
   <p class="sub">各出力候補が実効的に何本の特徴に支えられているか(participation ratio)。12グラフで計測。</p>
   <figure class="chart">
     <svg viewBox="0 0 860 190" role="img" aria-label="participation ratioの分布: 汎用語と首都名">
@@ -226,7 +240,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 </section>
 
 <section id="readout">
-  <h2>④ 「知ってるのに言えない」の解剖 — 失敗には2種類ある</h2>
+  <h2>🧠 ④ 「知ってるのに言えない」の解剖 — 失敗には2種類ある</h2>
   <p class="sub">同じ知識(フランスの首都)を3つの言い回しで聞いたとき、内部で起きていることが3レジームに分かれた。</p>
   <div class="regimes">
     <div class="regime">
@@ -268,7 +282,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 </section>
 
 <section id="universality">
-  <h2>⑤ これはgemmaの個性か、LLM一般の性質か(検証中)</h2>
+  <h2>🌍 ⑤ これはgemmaの個性か、LLM一般の性質か(検証中)</h2>
   <p class="sub">RTX 5070 Ti + circuit-tracerでQwen3-1.7Bのグラフをローカル生成し再現性を検証 — 5枚生成した時点でPCフリーズ事故により中断(原因と対策は記録済み)。</p>
   <figure class="chart">
     <svg viewBox="0 0 860 210" role="img" aria-label="gemmaとQwenの再現比較">
@@ -290,7 +304,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 </section>
 
 <section id="fails">
-  <h2>⑥ 失敗の記録 — ここが一番大事</h2>
+  <h2>💥 ⑥ 失敗の記録 — ここが一番大事</h2>
   <p class="sub">うまくいった話だけ並べるのは研究ではないので、失敗も同じ解像度で残す。</p>
   <div class="fails">
     <div class="fail"><span class="x">✗</span><p><b>幻覚誘発に2連敗。</b>マイナー国の首都(ブルキナファソ等)でも11/12正解、逆方向(首都→国)も12/12正解。2Bモデルの首都知識は予想よりずっと頑健で、誤答の構造比較が成立しなかった。</p></div>

@@ -1,20 +1,35 @@
-/* Hallmark · macrostructure: Stat-Led · tone: technical-austere · theme: custom (CLAUDE.md C-minimal)
- * vibe: "研究レポート・余白広く・データ密度は図に集約"
- * paper oklch(100% 0 0) · ink oklch(20% 0.005 240) · accent oklch(55% 0.15 250) cool-blue
- * display: -apple-system stack · body: same (single-stack is the design)
- * axes: light / system-native / cool
+/* Hallmark · macrostructure: Stat-Led · tone: technical-bright · theme: studied-DNA (source: hajimedayo328.github.io/market-graph-presentation)
+ * paper oklch(100% 0 0) · ink oklch(20% 0.005 240) · semantic 5-accent (blue/green/amber/red/purple)
+ * display: -apple-system stack · body: same
+ * axes: light / system-native / multi-chromatic
  */
 :root {
   --color-paper: oklch(100% 0 0);
   --color-paper-2: oklch(97.5% 0.003 240);
   --color-ink: oklch(20% 0.005 240);
-  --color-muted: oklch(55% 0.01 240);
+  --color-muted: oklch(48% 0.01 240);
   --color-subtle: oklch(92% 0.005 240);
-  --color-accent: oklch(55% 0.15 250);
-  --color-accent-soft: oklch(93% 0.03 250);
-  --color-warn: oklch(60% 0.18 25);
-  --color-ok: oklch(58% 0.13 150);
-  --color-focus: oklch(55% 0.15 250);
+
+  /* semantic accents (market-graph DNA: #3b82f6 #10b981 #f59e0b #ef4444 #a855f7) */
+  --color-blue: oklch(62% 0.19 258);
+  --color-green: oklch(70% 0.15 163);
+  --color-amber: oklch(77% 0.16 70);
+  --color-red: oklch(63% 0.21 27);
+  --color-purple: oklch(65% 0.22 305);
+
+  /* soft backgrounds for emphasis cards (#f0f9ff / #fffbeb style) */
+  --color-blue-soft: oklch(97% 0.015 250);
+  --color-green-soft: oklch(97% 0.02 163);
+  --color-amber-soft: oklch(98% 0.025 90);
+  --color-red-soft: oklch(97% 0.015 27);
+  --color-purple-soft: oklch(97% 0.018 305);
+
+  --color-accent: var(--color-blue);
+  --color-focus: var(--color-blue);
+  /* 旧トークン互換エイリアス */
+  --color-warn: var(--color-red);
+  --color-ok: var(--color-green);
+  --color-accent-soft: var(--color-blue-soft);
 
   --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Hiragino Sans", "Noto Sans JP", sans-serif;
   --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Sans", "Noto Sans JP", sans-serif;
@@ -36,5 +51,6 @@
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --rule: 1px solid var(--color-subtle);
-  --radius: 6px;
+  --radius: 8px;
+  --shadow-card: 0 1px 3px oklch(0% 0 0 / 0.08);
 }
