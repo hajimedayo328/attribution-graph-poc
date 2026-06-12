@@ -132,6 +132,19 @@ PROMPTS = [
     ("M", "Fact: The number of letters in the word 'morning' is", ["7", "seven"]),
     ("M", "Fact: The number of letters in the word 'computer' is", ["8", "eight"]),
     ("M", "Fact: The number of letters in the word 'mountain' is", ["8", "eight"]),
+    # N: few-shot文字数カウント(末尾空白で数字top-1を強制。スクリーニング済み: 正答6/誤答6)
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'sun' has ", ["3"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'tree' has ", ["4"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'book' has ", ["4"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'house' has ", ["5"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'water' has ", ["5"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'banana' has ", ["6"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'flower' has ", ["6"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'kitchen' has ", ["7"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'morning' has ", ["7"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'computer' has ", ["8"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'mountain' has ", ["8"]),
+    ("N", "The word 'dog' has 3 letters. The word 'apple' has 5 letters. The word 'elephant' has ", ["8"]),
 ]
 
 

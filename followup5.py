@@ -47,7 +47,7 @@ def gini(values):
 
 def main() -> None:
     with open(MANIFEST, encoding="utf-8", newline="") as f:
-        manifest = [r for r in csv.DictReader(f) if r["category"] in ("F", "K", "L", "M")]
+        manifest = [r for r in csv.DictReader(f) if r["category"] in ("F", "K", "L", "M", "N")]
 
     rows = []
     for m in manifest:
@@ -102,12 +102,12 @@ def main() -> None:
             _, p = mann_whitney(a, b)
             print(f"{k:16s} {sum(a)/len(a):10.3f} {sum(b)/len(b):10.3f} {p:8.4f}")
 
-    # 正誤比較はM(counting)内のみで行う(フォーマット交絡を避ける)
-    m_rows = [r for r in rows if r["cat"] == "M"]
-    if len(m_rows) >= 6:
-        cor = [r for r in m_rows if r["correct"]]
-        inc = [r for r in m_rows if not r["correct"]]
-        print(f"\n[M: counting内比較] 正答={len(cor)} 誤答={len(inc)}")
+    # 正誤比較はN(few-shot counting)内のみで行う(フォーマット交絡を避ける)
+    n_rows = [r for r in rows if r["cat"] == "N"]
+    if len(n_rows) >= 6:
+        cor = [r for r in n_rows if r["correct"]]
+        inc = [r for r in n_rows if not r["correct"]]
+        print(f"\n[N: few-shot counting内比較] 正答={len(cor)} 誤答={len(inc)}")
     else:
         cor = [r for r in rows if r["correct"]]
         inc = [r for r in rows if not r["correct"]]
