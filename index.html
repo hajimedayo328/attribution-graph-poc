@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>attribution-graph-poc — LLMの思考回路をグラフ理論で読む</title>
+<meta name="description" content="gemma-2-2bのattribution graph 92枚をグラフ理論で統計分析した個人研究PoC。完全無料パイプライン。">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* Hallmark · pre-emit critique: P4 H5 E4 S5 R5 V4 */
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+html, body { overflow-x: clip; }
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  line-height: 1.75;
+  font-size: var(--text-base);
+}
+a { color: var(--color-accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 var(--space-md); }
+
+header.site {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: var(--space-md) 0; border-bottom: var(--rule);
+}
+header.site .name { font-weight: 600; font-size: var(--text-sm); letter-spacing: 0.02em; }
+header.site a.gh { font-size: var(--text-sm); white-space: nowrap; }
+
+.hero { padding: var(--space-2xl) 0 var(--space-xl); }
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 700; line-height: 1.18; letter-spacing: -0.02em;
+  overflow-wrap: anywhere; min-width: 0;
+  max-width: 24ch;
+}
+.hero p.lede { margin-top: var(--space-lg); max-width: 56ch; color: var(--color-muted); }
+.hero p.lede strong { color: var(--color-ink); font-weight: 600; }
+
+.stats {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-md); margin-top: var(--space-xl);
+  border-top: var(--rule); padding-top: var(--space-lg);
+}
+.stats .stat .n { font-size: var(--text-2xl); font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.stats .stat .l { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-xs); }
+
+section { padding: var(--space-xl) 0; border-top: var(--rule); }
+section h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-display-s); font-weight: 700; letter-spacing: -0.015em;
+  line-height: 1.25; max-width: 30ch; overflow-wrap: anywhere; min-width: 0;
+}
+section .sub { color: var(--color-muted); margin-top: var(--space-sm); max-width: 60ch; }
+.finding {
+  margin-top: var(--space-md); padding: var(--space-md);
+  background: var(--color-paper-2); border-radius: var(--radius);
+  font-size: var(--text-base); max-width: 100%;
+}
+.finding b { font-weight: 650; }
+
+figure.chart { margin: var(--space-lg) 0 0; }
+figure.chart svg { width: 100%; height: auto; display: block; }
+figure.chart figcaption { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-sm); max-width: 64ch; }
+.bar-label { font-size: 13px; fill: var(--color-ink); font-family: var(--font-body); }
+.bar-value { font-size: 13px; fill: var(--color-ink); font-weight: 600; font-family: var(--font-mono); }
+.bar-muted { fill: var(--color-muted); }
+.axis-label { font-size: 12px; fill: var(--color-muted); font-family: var(--font-body); }
+.bar-main { fill: var(--color-accent); }
+.bar-base { fill: var(--color-subtle); }
+.bar-base2 { fill: oklch(80% 0.01 240); }
+.dot-generic { fill: var(--color-warn); opacity: 0.85; }
+.dot-content { fill: var(--color-accent); opacity: 0.85; }
+.dot-yes { fill: var(--color-ok); }
+.dot-no { fill: var(--color-warn); }
+.gridline { stroke: var(--color-subtle); stroke-width: 1; }
+
+.regimes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-md); margin-top: var(--space-lg); }
+.regime { border: var(--rule); border-radius: var(--radius); padding: var(--space-md); }
+.regime .tag { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-muted); }
+.regime h3 { font-size: var(--text-lg); margin-top: var(--space-sm); line-height: 1.4; }
+.regime p { font-size: var(--text-sm); color: var(--color-muted); margin-top: var(--space-sm); }
+.regime .verdict { display: inline-block; margin-top: var(--space-sm); font-size: var(--text-sm); font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+.v-ok { background: oklch(93% 0.04 150); color: oklch(40% 0.12 150); }
+.v-mid { background: oklch(95% 0.05 85); color: oklch(45% 0.12 70); }
+.v-no { background: oklch(94% 0.04 25); color: oklch(45% 0.15 25); }
+
+.fails { margin-top: var(--space-lg); display: grid; gap: var(--space-md); }
+.fail { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-md); align-items: baseline; }
+.fail .x { font-family: var(--font-mono); color: var(--color-warn); font-weight: 700; }
+.fail p { color: var(--color-muted); font-size: var(--text-base); }
+.fail p b { color: var(--color-ink); }
+
+.caveat {
+  margin-top: var(--space-xl); padding: var(--space-md);
+  border-left: 3px solid var(--color-warn); background: var(--color-paper-2);
+  font-size: var(--text-sm); color: var(--color-muted); max-width: 70ch;
+}
+
+footer.site { border-top: var(--rule); padding: var(--space-xl) 0 var(--space-2xl); }
+footer.site .row { display: flex; flex-wrap: wrap; gap: var(--space-md) var(--space-lg); font-size: var(--text-sm); }
+footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); color: var(--color-muted); max-width: 60ch; }
+
+@media (max-width: 640px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .regimes { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="site">
+  <span class="name">attribution-graph-poc</span>
+  <a class="gh" href="https://github.com/hajimedayo328/attribution-graph-poc">GitHub →</a>
+</header>
+
+<main>
+<div class="hero">
+  <h1>LLMの思考回路を、グラフ理論で読んでみた</h1>
+  <p class="lede">gemma-2-2bの内部計算を可視化した<strong>attribution graph 92枚</strong>を無料APIで集め、NetworkXで統計・検定・介入まで回した個人研究PoC。<strong>総コスト0円</strong>。成功した実験も、失敗した実験も、全部ここにある。</p>
+  <div class="stats">
+    <div class="stat"><div class="n">92<span style="font-size:1rem">枚</span></div><div class="l">attribution graph<br>(gemma) + Qwen 5枚</div></div>
+    <div class="stat"><div class="n">12<span style="font-size:1rem">本</span></div><div class="l">実験A〜L<br>(うち失敗3本も記録)</div></div>
+    <div class="stat"><div class="n">¥0</div><div class="l">Neuronpedia無料API<br>+ 手元GPU</div></div>
+    <div class="stat"><div class="n">2<span style="font-size:1rem">日</span></div><div class="l">2026年6月10–12日<br>Claude Codeと共同作業</div></div>
+  </div>
+</div>
+
+<section id="importance">
+  <h2>① 重要ノードの特定 — PageRankは「頭」にだけ効く</h2>
+  <p class="sub">circuit-tracerが因果計算で出す公式の重要度を、純粋なグラフ理論の指標だけでどこまで再現できるか(n=60)。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 270" role="img" aria-label="重要度再現の比較: 順位相関と最重要top10一致数">
+      <text x="0" y="18" class="bar-label" font-weight="600">順位相関 ρ(全ノードの順位の再現)</text>
+      <g transform="translate(150,30)">
+        <text x="-10" y="14" text-anchor="end" class="bar-label">個人化PageRank</text>
+        <rect x="0" y="2" width="453" height="16" class="bar-main"/><text x="461" y="15" class="bar-value">0.686</text>
+        <text x="-10" y="40" text-anchor="end" class="bar-label">重み付き出次数</text>
+        <rect x="0" y="28" width="456" height="16" class="bar-base2"/><text x="464" y="41" class="bar-value">0.691</text>
+        <text x="-10" y="66" text-anchor="end" class="bar-label">重み付き総次数</text>
+        <rect x="0" y="54" width="370" height="16" class="bar-base"/><text x="378" y="67" class="bar-value">0.561</text>
+        <text x="-10" y="92" text-anchor="end" class="bar-label">重み付き入次数</text>
+        <rect x="0" y="80" width="248" height="16" class="bar-base"/><text x="256" y="93" class="bar-value">0.376</text>
+      </g>
+      <text x="0" y="160" class="bar-label" font-weight="600">最重要ノードtop10の一致数(/10)</text>
+      <g transform="translate(150,172)">
+        <text x="-10" y="14" text-anchor="end" class="bar-label">個人化PageRank</text>
+        <rect x="0" y="2" width="442" height="16" class="bar-main"/><text x="450" y="15" class="bar-value">6.70</text>
+        <text x="-10" y="40" text-anchor="end" class="bar-label">重み付き総次数</text>
+        <rect x="0" y="28" width="360" height="16" class="bar-base"/><text x="368" y="41" class="bar-value">5.45</text>
+        <text x="-10" y="66" text-anchor="end" class="bar-label">重み付き出次数</text>
+        <rect x="0" y="54" width="249" height="16" class="bar-base"/><text x="257" y="67" class="bar-value">3.77</text>
+      </g>
+    </svg>
+    <figcaption>順位相関では自明な局所指標(出次数)がPageRankと互角 — 大半のノードの重要度は局所情報で決まる。しかし最重要top10の特定ではPageRankが圧勝。大域構造は「ランキングの頭」にだけ効く。</figcaption>
+  </figure>
+  <div class="finding"><b>含意:</b> 「グラフ理論で因果計算を代替できる」と無条件に言うと半分嘘になる。主張するならtop-k precisionで。</div>
+</section>
+
+<section id="phrasing">
+  <h2>② 回路は内容ではなく「言い回し」を追う — ただし内容は局在していた</h2>
+  <p class="sub">同じ質問(○○の首都は?)を3つの言い回し×4カ国で生成し、回路の共有度(Jaccard類似度)を比較。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 240" role="img" aria-label="言い回しvs内容のJaccard類似度比較(3スコープ)">
+      <g transform="translate(190,8)">
+        <text x="-10" y="30" text-anchor="end" class="bar-label" font-weight="600">全位置</text>
+        <rect x="0" y="6" width="601" height="14" class="bar-base2"/><text x="609" y="17" class="bar-value">0.668 同じ言い回し</text>
+        <rect x="0" y="24" width="256" height="14" class="bar-main"/><text x="264" y="35" class="bar-value">0.284 同じ国</text>
+        <text x="-10" y="100" text-anchor="end" class="bar-label" font-weight="600">国トークン位置<tspan x="-10" dy="16">のみ</tspan></text>
+        <rect x="0" y="76" width="291" height="14" class="bar-base2"/><text x="299" y="87" class="bar-value">0.323 同じ言い回し</text>
+        <rect x="0" y="94" width="364" height="14" class="bar-main"/><text x="372" y="105" class="bar-value">0.404 同じ国 ← 逆転</text>
+        <text x="-10" y="170" text-anchor="end" class="bar-label" font-weight="600">最終トークン位置</text>
+        <rect x="0" y="146" width="588" height="14" class="bar-base2"/><text x="596" y="157" class="bar-value">0.653 同じ言い回し</text>
+        <rect x="0" y="164" width="280" height="14" class="bar-main"/><text x="288" y="175" class="bar-value">0.311 同じ国</text>
+      </g>
+      <text x="190" y="225" class="axis-label">1-NN分類: 全位置=言い回し12/12 → 国トークン位置=同じ国8/12に逆転</text>
+    </svg>
+    <figcaption>グラフ全体では「同じテンプレートは同じ回路」が支配。しかし国トークンの真上だけ見ると内容(どの国か)が優位に逆転する。内容の回路は空間的に局在していた。</figcaption>
+  </figure>
+  <div class="finding"><b>意味の裏取りも成功:</b> 抽出した国固有回路をNeuronpediaのauto-interp説明と照合 — France固有=「フランスへの言及」(L4)・「フランスの地名」(L2)、Egypt固有=「中東の場所」(L14)・「政治革命」(L7)。</div>
+</section>
+
+<section id="pr">
+  <h2>③ 答えは少数精鋭、無難な続きは物量 — 支持基盤の3倍差</h2>
+  <p class="sub">各出力候補が実効的に何本の特徴に支えられているか(participation ratio)。12グラフで計測。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 190" role="img" aria-label="participation ratioの分布: 汎用語と首都名">
+      <line x1="120" y1="40" x2="820" y2="40" class="gridline"/>
+      <line x1="120" y1="100" x2="820" y2="100" class="gridline"/>
+      <text x="110" y="44" text-anchor="end" class="bar-label">汎用語 " a"</text>
+      <text x="110" y="104" text-anchor="end" class="bar-label">首都名</text>
+      <!-- generic: 196.9..280.8 → x = 120 + v*2.2 -->
+      <circle cx="553" cy="40" r="7" class="dot-generic"/><circle cx="558" cy="40" r="7" class="dot-generic"/>
+      <circle cx="563" cy="40" r="7" class="dot-generic"/><circle cx="554" cy="40" r="7" class="dot-generic"/>
+      <circle cx="706" cy="40" r="7" class="dot-generic"/><circle cx="738" cy="40" r="7" class="dot-generic"/>
+      <!-- content: 67.3..84.9 -->
+      <circle cx="268" cy="100" r="7" class="dot-content"/><circle cx="278" cy="100" r="7" class="dot-content"/>
+      <circle cx="282" cy="100" r="7" class="dot-content"/><circle cx="283" cy="100" r="7" class="dot-content"/>
+      <circle cx="279" cy="100" r="7" class="dot-content"/><circle cx="290" cy="100" r="7" class="dot-content"/>
+      <circle cx="290" cy="100" r="7" class="dot-content"/><circle cx="307" cy="100" r="7" class="dot-content"/>
+      <text x="700" y="22" class="bar-value">mean 224本</text>
+      <text x="255" y="82" class="bar-value" fill="var(--color-accent)">mean 75本</text>
+      <g transform="translate(120,140)">
+        <line x1="0" y1="0" x2="700" y2="0" class="gridline"/>
+        <text x="0" y="18" class="axis-label">0</text>
+        <text x="220" y="18" class="axis-label">100</text>
+        <text x="440" y="18" class="axis-label">200</text>
+        <text x="660" y="18" class="axis-label">300</text>
+        <text x="700" y="36" text-anchor="end" class="axis-label">実効支持本数(participation ratio)</text>
+      </g>
+    </svg>
+    <figcaption>12グラフで完全分離。汎用的な続け方(" a"など)は約200〜280本の特徴に広く浅く支えられ、答えの単語は約67〜85本の集中回路。</figcaption>
+  </figure>
+  <div class="finding"><b>介入実験(steering)の失敗がこれで説明できた:</b> " a"を押す特徴を5本抑制しても倒れなかったのは、支持基盤の約2%しか削っていなかったから。実際に" a"の降格には成功したが、Parisではなく別の汎用語が繰り上がった(ヒドラ構造)。</div>
+</section>
+
+<section id="readout">
+  <h2>④ 「知ってるのに言えない」の解剖 — 失敗には2種類ある</h2>
+  <p class="sub">同じ知識(フランスの首都)を3つの言い回しで聞いたとき、内部で起きていることが3レジームに分かれた。</p>
+  <div class="regimes">
+    <div class="regime">
+      <span class="tag">F · "Fact: The capital of France is"</span>
+      <h3>完走</h3>
+      <p>国情報がlogitまで到達。国位置からの直接流入シェア0.19〜0.37。</p>
+      <span class="verdict v-ok">Paris と答える</span>
+    </div>
+    <div class="regime">
+      <span class="tag">H · "The city that serves as…"</span>
+      <h3>考えたのに言わない</h3>
+      <p>Parisは候補2位に存在し(p=0.094)、国情報も流入(シェア0.20)。しかし汎用の " a" に競り負ける。</p>
+      <span class="verdict v-mid">" a" と答える(惜敗)</span>
+    </div>
+    <div class="regime">
+      <span class="tag">G · "France's capital city is"</span>
+      <h3>考えてすらいない</h3>
+      <p>Parisがtop10候補に不在。回答モード自体が起動せず、輸送量も低い。</p>
+      <span class="verdict v-no">" a" と答える(不戦敗)</span>
+    </div>
+  </div>
+  <figure class="chart">
+    <svg viewBox="0 0 860 180" role="img" aria-label="国位置からtop logitへの直接流入シェア散布図">
+      <line x1="120" y1="20" x2="120" y2="120" class="gridline"/>
+      <line x1="120" y1="120" x2="820" y2="120" class="gridline"/>
+      <!-- x = 120 + share*1800 -->
+      <circle cx="750" cy="55" r="7" class="dot-yes"/><circle cx="480" cy="70" r="7" class="dot-yes"/>
+      <circle cx="453" cy="55" r="7" class="dot-yes"/><circle cx="581" cy="70" r="7" class="dot-yes"/>
+      <circle cx="793" cy="55" r="7" class="dot-yes"/><circle cx="624" cy="70" r="7" class="dot-yes"/>
+      <circle cx="260" cy="95" r="7" class="dot-no"/><circle cx="250" cy="95" r="7" class="dot-no"/>
+      <circle cx="233" cy="95" r="7" class="dot-no"/><circle cx="257" cy="95" r="7" class="dot-no"/>
+      <circle cx="268" cy="95" r="7" class="dot-no"/><circle cx="266" cy="95" r="7" class="dot-no"/>
+      <text x="453" y="40" class="bar-value" fill="var(--color-ok)">答えた6枚 → 0.185〜0.374</text>
+      <text x="233" y="148" class="bar-value" fill="var(--color-warn)">答えない6枚 → 0.063〜0.082</text>
+      <text x="820" y="170" text-anchor="end" class="axis-label">国トークン位置 → top logit への直接流入シェア(12グラフで完全分離)</text>
+    </svg>
+    <figcaption>決定打は同じ言い回しH内の対比(Japan/Egyptは答え、France/Germanyは答えない) — 言い回し交絡なしで、輸送は同水準なのに読み出しだけが違った。※「選ばれた出力への流入」を測る指標のため部分的に構成上自明な点はRESULTS.mdに明記。</figcaption>
+  </figure>
+</section>
+
+<section id="universality">
+  <h2>⑤ これはgemmaの個性か、LLM一般の性質か(検証中)</h2>
+  <p class="sub">RTX 5070 Ti + circuit-tracerでQwen3-1.7Bのグラフをローカル生成し再現性を検証 — 5枚生成した時点でPCフリーズ事故により中断(原因と対策は記録済み)。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 210" role="img" aria-label="gemmaとQwenの再現比較">
+      <g transform="translate(220,10)">
+        <text x="-10" y="16" text-anchor="end" class="bar-label" font-weight="600">言い回し支配</text>
+        <text x="-10" y="34" text-anchor="end" class="axis-label">(同じ言い回し−同じ国)</text>
+        <rect x="0" y="4" width="384" height="14" class="bar-main"/><text x="392" y="15" class="bar-value">gemma +0.384</text>
+        <rect x="0" y="22" width="233" height="14" class="bar-base2"/><text x="241" y="33" class="bar-value">Qwen +0.233(n=5) → 再現傾向</text>
+        <text x="-10" y="86" text-anchor="end" class="bar-label" font-weight="600">G表現の読み出し不全</text>
+        <rect x="0" y="74" width="400" height="14" class="bar-warnfill" fill="var(--color-warn)"/><text x="408" y="85" class="bar-value">gemma 4/4失敗</text>
+        <rect x="0" y="92" width="0" height="14"/><text x="8" y="103" class="bar-value">Qwen 即答('paris') → <tspan font-weight="700">非再現</tspan></text>
+        <text x="-10" y="156" text-anchor="end" class="bar-label" font-weight="600">首都トークンのPR</text>
+        <rect x="0" y="144" width="150" height="14" class="bar-main"/><text x="158" y="155" class="bar-value">gemma 75本</text>
+        <rect x="0" y="162" width="53" height="14" class="bar-base2"/><text x="61" y="173" class="bar-value">Qwen 26本(規模が違うため直接比較不可)</text>
+      </g>
+    </svg>
+    <figcaption>暫定結論(n=5): 回路の言い回し支配は2モデル共通の気配。「プロンプトで答えられなくなる」現象はモデル固有 — むしろ「どのモデルがどの言い回しに頑健か」という比較軸が生まれた。</figcaption>
+  </figure>
+</section>
+
+<section id="fails">
+  <h2>⑥ 失敗の記録 — ここが一番大事</h2>
+  <p class="sub">うまくいった話だけ並べるのは研究ではないので、失敗も同じ解像度で残す。</p>
+  <div class="fails">
+    <div class="fail"><span class="x">✗</span><p><b>幻覚誘発に2連敗。</b>マイナー国の首都(ブルキナファソ等)でも11/12正解、逆方向(首都→国)も12/12正解。2Bモデルの首都知識は予想よりずっと頑健で、誤答の構造比較が成立しなかった。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>reversal curse不発。</b>「逆転の呪い」を狙ったが、国↔首都ペアは事前学習で双方向に高頻度出現するため呪いがかからない。設計ミス。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>最強経路のホップ数は全60枚で「1」。</b>attribution graphはskip接続支配でホップ数は無意味と判明。代わりに「直接経路の弱さ」が多段推論の指紋になることを発見(転んでもただでは起きない)。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>counting(文字数)でも幻覚誘発に失敗 — 3連敗。</b>「'cat'の文字数は」に対しモデルは数字を出さず比較構文(" equal"" less")へ流れる。誤答ではなく「回答モード不起動」(④のGレジームと同型)。次は出力形式を固定するプロンプト設計が必要。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>PCフリーズ事故。</b>37.6GBのtranscoderを32GBのRAMにロードしようとして物理再起動に至った。「ロード前にサイズvsRAMを数値比較」を仕組みとして記録。</p></div>
+  </div>
+  <div class="caveat"><b>このページ全体への注意:</b> n=10前後/群・単一〜2モデル・自作プロンプトによる探索的結果であり、すべて「研究の種」。attribution graph自体が置換モデルの近似(誤差ノード8〜11%)で、見ているのは「解釈しやすく作り直した影」である点も含め、確定的な主張はひとつもない。検定はMann-Whitney U + BH補正、詳細は<a href="https://github.com/hajimedayo328/attribution-graph-poc/blob/main/RESULTS.md">RESULTS.md</a>。</div>
+</section>
+</main>
+
+<footer class="site">
+  <div class="row">
+    <a href="https://github.com/hajimedayo328/attribution-graph-poc">リポジトリ</a>
+    <a href="https://github.com/hajimedayo328/attribution-graph-poc/blob/main/RESULTS.md">RESULTS.md(全実験)</a>
+    <a href="https://www.neuronpedia.org/">Neuronpedia</a>
+    <a href="https://github.com/safety-research/circuit-tracer">circuit-tracer</a>
+  </div>
+  <p class="note">データ: Neuronpedia生成API(gemma-2-2b, gemmascope-transcoder-16k) + circuit-tracerローカル生成(Qwen3-1.7B)。分析: NetworkX。2026年6月10–12日、Claude Codeとの共同作業。グラフ本体はリポジトリのmanifest.csvから再取得可能。</p>
+</footer>
+
+</div>
+</body>
+</html>

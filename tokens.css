@@ -1,0 +1,40 @@
+/* Hallmark · macrostructure: Stat-Led · tone: technical-austere · theme: custom (CLAUDE.md C-minimal)
+ * vibe: "研究レポート・余白広く・データ密度は図に集約"
+ * paper oklch(100% 0 0) · ink oklch(20% 0.005 240) · accent oklch(55% 0.15 250) cool-blue
+ * display: -apple-system stack · body: same (single-stack is the design)
+ * axes: light / system-native / cool
+ */
+:root {
+  --color-paper: oklch(100% 0 0);
+  --color-paper-2: oklch(97.5% 0.003 240);
+  --color-ink: oklch(20% 0.005 240);
+  --color-muted: oklch(55% 0.01 240);
+  --color-subtle: oklch(92% 0.005 240);
+  --color-accent: oklch(55% 0.15 250);
+  --color-accent-soft: oklch(93% 0.03 250);
+  --color-warn: oklch(60% 0.18 25);
+  --color-ok: oklch(58% 0.13 150);
+  --color-focus: oklch(55% 0.15 250);
+
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Consolas, monospace;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 32px;
+  --space-xl: 64px;
+  --space-2xl: 96px;
+
+  --text-sm: 0.8125rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-2xl: 1.75rem;
+  --text-display-s: clamp(1.8rem, 4.5vw, 2.6rem);
+  --text-display: clamp(2.2rem, 6vw, 3.4rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --rule: 1px solid var(--color-subtle);
+  --radius: 6px;
+}
