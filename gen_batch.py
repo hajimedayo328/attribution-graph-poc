@@ -119,6 +119,19 @@ PROMPTS = [
     ("L", "Fact: The country whose capital is Ljubljana is", ["slovenia"]),
     ("L", "Fact: The country whose capital is Riga is", ["latvia"]),
     ("L", "Fact: The country whose capital is Tallinn is", ["estonia"]),
+    # M: 文字数カウント(LLMが構造的に苦手な領域。正誤を割って幻覚の構造比較をする3度目の挑戦)
+    ("M", "Fact: The number of letters in the word 'cat' is", ["3", "three"]),
+    ("M", "Fact: The number of letters in the word 'sun' is", ["3", "three"]),
+    ("M", "Fact: The number of letters in the word 'tree' is", ["4", "four"]),
+    ("M", "Fact: The number of letters in the word 'book' is", ["4", "four"]),
+    ("M", "Fact: The number of letters in the word 'house' is", ["5", "five"]),
+    ("M", "Fact: The number of letters in the word 'water' is", ["5", "five"]),
+    ("M", "Fact: The number of letters in the word 'banana' is", ["6", "six"]),
+    ("M", "Fact: The number of letters in the word 'flower' is", ["6", "six"]),
+    ("M", "Fact: The number of letters in the word 'kitchen' is", ["7", "seven"]),
+    ("M", "Fact: The number of letters in the word 'morning' is", ["7", "seven"]),
+    ("M", "Fact: The number of letters in the word 'computer' is", ["8", "eight"]),
+    ("M", "Fact: The number of letters in the word 'mountain' is", ["8", "eight"]),
 ]
 
 

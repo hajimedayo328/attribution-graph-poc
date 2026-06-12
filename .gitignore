@@ -8,3 +8,5 @@ data/*.json
 gen.log
 __pycache__/
 *.pyc
+!data/qwen/
+!data/qwen/*.json
