@@ -93,6 +93,16 @@ figure.chart figcaption { font-size: var(--text-sm); color: var(--color-muted); 
 .dot-no { fill: var(--color-red); }
 .gridline { stroke: var(--color-subtle); stroke-width: 1; }
 
+#counting .finding { background: var(--color-amber-soft); border-left-color: var(--color-amber); }
+#knows .finding, #culprit .finding { background: var(--color-green-soft); border-left-color: var(--color-green); }
+#refuted .finding { background: var(--color-purple-soft); border-left-color: var(--color-purple); }
+.bar-amber { fill: var(--color-amber); }
+.bar-green { fill: var(--color-green); }
+.bar-red { fill: var(--color-red); }
+.lens-line { fill: none; stroke: var(--color-green); stroke-width: 3; stroke-linejoin: round; }
+.lens-drop { fill: none; stroke: var(--color-red); stroke-width: 3; stroke-linejoin: round; }
+.lens-fill { fill: var(--color-green); opacity: 0.07; }
+
 .regimes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-md); margin-top: var(--space-lg); }
 .regime { border: var(--rule); border-radius: var(--radius); padding: var(--space-md); box-shadow: var(--shadow-card); }
 .regimes .regime:nth-child(1) { background: var(--color-green-soft); border-top: 3px solid var(--color-green); }
@@ -142,10 +152,10 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 <main>
 <div class="hero">
   <h1>LLMの思考回路を、グラフ理論で読んでみた</h1>
-  <p class="lede">gemma-2-2bの内部計算を可視化した<strong>attribution graph 156枚</strong>を無料API+手元GPUで集め、NetworkXで統計・検定・介入・3モデル比較まで回した個人研究PoC。<strong>総コスト0円</strong>。成功した実験も、失敗した実験も、全部ここにある。</p>
+  <p class="lede">gemma-2-2bの内部計算を可視化した<strong>attribution graph 156枚</strong>を無料API+手元GPUで集め、NetworkXの統計・検定から<strong>線形プローブ・logit lens・因果介入</strong>まで回した個人研究PoC。終盤では「なぜLLMは文字を数えられないのか」を<strong>観察→分解→介入の三段</strong>で犯人特定まで追い込んだ。<strong>総コスト0円</strong>。成功も失敗も、全部ここにある。</p>
   <div class="stats">
     <div class="stat"><div class="n">156<span style="font-size:1rem">枚</span></div><div class="l">attribution graph<br>gemma 144 + Qwen 12</div></div>
-    <div class="stat"><div class="n">14<span style="font-size:1rem">本</span></div><div class="l">実験A〜M-2<br>(うち失敗・負の結果5本)</div></div>
+    <div class="stat"><div class="n">21<span style="font-size:1rem">本</span></div><div class="l">実験A〜U<br>(うち失敗・負の結果7本)</div></div>
     <div class="stat"><div class="n">¥0</div><div class="l">Neuronpedia無料API<br>+ 手元GPU</div></div>
     <div class="stat"><div class="n">4<span style="font-size:1rem">日</span></div><div class="l">2026年6月10–13日<br>Claude Codeと共同作業</div></div>
   </div>
@@ -305,15 +315,114 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
     <figcaption>普遍候補: ①回路の言い回し支配 ②内容回路の国トークン位置への局在 ③「考えたのに負ける/考えてすらいない」の2レジーム(Qwen0.6BのH-Germany敗北はgemmaの分類がそのまま当てはまった)。モデル依存: どの言い回しで答えられるか。</figcaption>
   </figure>
   <div class="finding"><b>このプロジェクトで一番強い主張:</b> 「同じテンプレートは同じ回路、内容は内容トークンの真上に局在」は3モデルで一貫して再現された。一方、モデル間の特徴粒度の違い(transcoder幅)が回路比較の本質的な交絡だと特定できた。</div>
+  <div class="finding"><b>「知ってるのに言えない」機構は数値まで一致:</b> gemmaの「答えた群はlogit直結シェアが高い(0.274)、答えない群は低い(0.075)」をQwen3-0.6Bで再測定すると <b>0.266 / 0.059</b> ── 別系列・別データのモデルで完全分離が再現どころか数値までほぼ重なった。H型失敗の惜敗(候補2位に首都が存在)もgemma=Paris 2位 / Qwen=Berlin 2位で同型。</div>
+</section>
+
+<section id="counting">
+  <h2>🔢 ⑥ なぜLLMは単語の文字を数えられないのか — 誤りを2つの壁に分解</h2>
+  <p class="sub">Qwen3-0.6Bにfew-shotで「'mountain'の文字数は?」と聞くと誤答する。その誤りの正体を、回路のノードレベル分析と入力形式の変換で切り分けた(n=84)。</p>
+  <div class="finding"><b>まず驚いたこと:</b> 誤答に特異的な回路特徴は<b>0個</b>(正答特異的も0個)。正答グラフも誤答グラフも<b>同じ回路部品</b>を使っていた。エラーは「どの部品を使うか」ではなく、同じ回路に<b>流れる値</b>の中にある ── 離散的な回路解析(attribution graphの主戦場)の射程外にある誤りの型。</div>
+  <figure class="chart">
+    <svg viewBox="0 0 860 190" role="img" aria-label="文字バラし形式による誤答の分解">
+      <g transform="translate(200,22)">
+        <text x="-12" y="15" text-anchor="end" class="bar-label" font-weight="600">通常 'mountain'</text>
+        <rect x="0" y="2" width="480" height="18" class="bar-red"/><text x="488" y="16" class="bar-value">誤答 13語 ・ '7'に飽和</text>
+        <text x="-12" y="71" text-anchor="end" class="bar-label" font-weight="600">文字に分解</text>
+        <text x="-12" y="88" text-anchor="end" class="axis-label">'m-o-u-n-t-a-i-n'</text>
+        <rect x="0" y="60" width="295" height="18" class="bar-green"/><text x="147" y="74" text-anchor="middle" class="bar-value" fill="white">8語が正答化</text>
+        <rect x="295" y="60" width="185" height="18" class="bar-amber"/><text x="387" y="74" text-anchor="middle" class="bar-value" fill="white">5語誤答</text>
+        <text x="0" y="124" class="axis-label">残る5語は8〜9文字 → 一律 <tspan font-weight="700" fill="var(--color-amber)">'10'</tspan> への丸め(morning→8 など±1)</text>
+      </g>
+    </svg>
+    <figcaption>文字をハイフンで分解して見せると誤答13語のうち8語が正答化。'8'の壁(mountain)も突破した。残りは8〜9文字で丸い数字に切り替わる。</figcaption>
+  </figure>
+  <div class="finding"><b>誤りは独立した2つの壁の合成だった:</b> ①<b>入力表現の限界(トークン化)</b> ── 'cat'は1トークンで、モデルは文字を見ていない。バラせば数えられる(=誤答の主因)。 ②<b>計数容量の限界</b> ── 文字が見えても約7±を超える正確なカウントは不能で、丸い数字('10')への概数推定に切り替わる。人間のsubitizing(瞬間把握)→概数推定の移行と同型。「限界」に見えたものは、設計を変えれば分解できる問いだった。</div>
+</section>
+
+<section id="knows">
+  <h2>🔦 ⑦ でも内部では、正解を知っていた — プローブとlogit lens</h2>
+  <p class="sub">出力が間違っていても、中間層の表現には正解が入っているのでは? という問いを2つの方法で覗いた。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 280" role="img" aria-label="logit lens: 正解の数字が中間層で浮上し最終層で消失する">
+      <line x1="120" y1="40" x2="120" y2="210" class="gridline"/>
+      <line x1="120" y1="210" x2="800" y2="210" class="gridline"/>
+      <text x="112" y="58" text-anchor="end" class="axis-label">高</text>
+      <text x="112" y="208" text-anchor="end" class="axis-label">低</text>
+      <text x="40" y="130" class="axis-label" transform="rotate(-90 40 130)">正解の数字がtop-1に近い度合い</text>
+      <polygon class="lens-fill" points="120,205 266,170 412,128 558,90 679,68 679,210 120,210"/>
+      <polyline class="lens-line" points="120,205 266,170 412,128 558,90 679,68"/>
+      <polyline class="lens-drop" points="679,68 728,128 776,200"/>
+      <circle cx="679" cy="68" r="7" class="dot-yes"/>
+      <circle cx="776" cy="200" r="7" class="dot-no"/>
+      <text x="679" y="52" text-anchor="middle" class="bar-value" fill="var(--color-green)">L23付近で浮上(top-1)</text>
+      <text x="768" y="188" text-anchor="end" class="bar-value" fill="var(--color-red)">最終層で消失 →</text>
+      <g transform="translate(0,228)">
+        <text x="120" y="0" class="axis-label">L0</text>
+        <text x="412" y="0" text-anchor="middle" class="axis-label">L12</text>
+        <text x="679" y="0" text-anchor="middle" class="axis-label">L23</text>
+        <text x="800" y="0" text-anchor="end" class="axis-label">L27(出力)</text>
+      </g>
+      <text x="140" y="64" class="bar-value">誤答46件中 <tspan font-weight="700" fill="var(--color-red)">28件(61%)</tspan> でこのパターン</text>
+    </svg>
+    <figcaption>各層の中間表現をモデル自身の出力層で復号(logit lens)すると、誤答の61%で正しい数字が中盤(中央値L23)でtop-1に浮上し、最終層までに失われていた。「正解が途中まで来て、消える」のトークンレベルの直接証拠。年の想起では「浮上したら消えない」(0件)で、これはcounting特有。</figcaption>
+  </figure>
+  <div class="finding"><b>線形プローブも同じ結論:</b> 最終位置のresidual streamからリッジ回帰で文字数を予測すると、<b>L24で正答率0.81</b>(±1以内0.99、R²0.94)。<b>モデル自身の出力0.45の倍近く正確</b>で、浅いL4からすでに線形に読める。トークン長交絡(R²0.43)では説明できない。→ <b>countingの失敗は「表現の欠如」ではなく「読み出し(言語化)の失敗」</b>。</div>
+</section>
+
+<section id="culprit">
+  <h2>🎯 ⑧ 犯人はL25のMLP — 弱めたら、数えられるようになった</h2>
+  <p class="sub">「中間で浮上した正解が最終層で消える」28件について、(誤答−正解)のlogit差への各層・各部品の寄与を分解(direct logit attribution)し、犯人を特定して因果まで確かめた。</p>
+  <div class="finding"><b>犯人:</b> 終盤のMLP群(L24〜27)、主犯は<b>L25のMLP</b>(単独で全正寄与の29%)。attentionの寄与は小さく、最終層のattentionはむしろ正解を守る側。中盤のL22 MLPは正解を強く守る(−0.44) ── 「中盤が正しく数え、終盤が壊す」構図。手口は一貫して<b>+1のオーバーシュート</b>(fox 3→'4'、tree 4→'5')。引用符を数えに含めるようなfencepost誤りの形。</div>
+  <figure class="chart">
+    <svg viewBox="0 0 860 200" role="img" aria-label="MLPアブレーションによるcounting正答率の変化">
+      <g transform="translate(230,20)">
+        <line x1="0" y1="-8" x2="0" y2="158" class="gridline"/>
+        <text x="-12" y="20" text-anchor="end" class="bar-label">ベースライン(無介入)</text>
+        <rect x="0" y="6" width="383" height="20" class="bar-base"/><text x="391" y="22" class="bar-value">0.45</text>
+        <text x="-12" y="70" text-anchor="end" class="bar-label">L25 MLP ×0.5</text>
+        <rect x="0" y="56" width="417" height="20" class="bar-amber"/><text x="425" y="72" class="bar-value">0.49</text>
+        <text x="-12" y="120" text-anchor="end" class="bar-label">L24-27 MLP ×0.5</text>
+        <rect x="0" y="106" width="485" height="20" class="bar-green"/><text x="493" y="122" class="bar-value" fill="var(--color-green)">0.57</text>
+        <text x="540" y="122" class="bar-value" fill="var(--color-green)" font-weight="700">+12pt</text>
+        <text x="0" y="156" class="axis-label">counting正答率(↑が良い)</text>
+      </g>
+    </svg>
+    <figcaption>犯人と名指しした終盤MLPを0.5倍に弱めると、モデルは数えるのが上手くなった。観察(logit lens)→分解(寄与)→介入(アブレーション)の三段で因果まで通した、このプロジェクトで最も完結した一本。</figcaption>
+  </figure>
+  <div class="caveat"><b>限界:</b> 単一テンプレート・n=84・1モデル。L24-27半減が他のタスク(首都想起など)を壊すか(副作用)は未測定 ── 「counting専用に賢くなった」のか「全体が壊れて偶然合った」のかの切り分けには対照タスクでの検証が必要。</div>
+</section>
+
+<section id="refuted">
+  <h2>🔁 ⑨ そして統一仮説は、1日で反証された — 数値知識は2系統</h2>
+  <p class="sub">ここまでで「LLMの失敗の多くは表現ではなく読み出しの失敗」という統一テーマが見えた。それを第3のタスク(歴史的な年の想起)で検証したら、逆の結果が出た。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 230" role="img" aria-label="文字数と年の想起で内部表現の読みやすさが逆転">
+      <g transform="translate(180,16)">
+        <text x="-12" y="14" text-anchor="end" class="bar-label" font-weight="600">文字数<tspan x="-12" dy="16">(counting)</tspan></text>
+        <rect x="0" y="2" width="216" height="16" class="bar-amber"/><text x="10" y="15" class="bar-value" fill="white">出力 正答率 0.45</text>
+        <rect x="0" y="22" width="451" height="16" class="bar-green"/><text x="10" y="35" class="bar-value" fill="white">内部プローブ R²0.94</text>
+        <text x="461" y="28" class="bar-value" fill="var(--color-green)" font-weight="700">内部 &gt; 出力</text>
+        <text x="-12" y="98" text-anchor="end" class="bar-label" font-weight="600">年の想起<tspan x="-12" dy="16">(recall)</tspan></text>
+        <rect x="0" y="86" width="326" height="16" class="bar-amber"/><text x="10" y="99" class="bar-value" fill="white">出力 正答率 0.68</text>
+        <rect x="0" y="106" width="245" height="16" class="bar-red"/><text x="10" y="119" class="bar-value" fill="white">内部プローブ R²0.51</text>
+        <text x="461" y="112" class="bar-value" fill="var(--color-red)" font-weight="700">出力 &gt; 内部</text>
+      </g>
+      <text x="430" y="196" text-anchor="middle" class="bar-value" font-weight="700" fill="var(--color-purple)">逆転</text>
+      <text x="430" y="217" text-anchor="middle" class="axis-label">出力=正答率 / 内部=線形プローブのR²(別単位、傾向の対比として)</text>
+    </svg>
+    <figcaption>countingは「内部表現 &gt; 出力」、年の想起は「出力 &gt; 内部プローブ」。統一テーマは1回目の一般化テストで境界線が引かれた。仮説が検証可能な形で立っていた証拠でもある。</figcaption>
+  </figure>
+  <div class="finding"><b>logit lensが謎を解いた ── 数値知識は2系統:</b> 文字数は浅い層(L4)から<b>線形の「数直線」</b>として存在し(プローブが読める)、L15以降で数字トークン方向に変換される(この変換が61%失敗=実験⑦)。一方、年は線形の数直線としては存在せず、<b>カテゴリカルなトークン方向</b>として深層で一気に具現化する(線形回帰では読めないがlogit lensでは見える)。「読み出しの失敗」は普遍法則ではなく<b>タスク依存</b>だった。</div>
 </section>
 
 <section id="fails">
-  <h2>💥 ⑥ 失敗の記録 — ここが一番大事</h2>
+  <h2>💥 ⑩ 失敗の記録 — ここが一番大事</h2>
   <p class="sub">うまくいった話だけ並べるのは研究ではないので、失敗も同じ解像度で残す。</p>
   <div class="fails">
     <div class="fail"><span class="x">✗</span><p><b>幻覚誘発に2連敗。</b>マイナー国の首都(ブルキナファソ等)でも11/12正解、逆方向(首都→国)も12/12正解。2Bモデルの首都知識は予想よりずっと頑健で、誤答の構造比較が成立しなかった。</p></div>
     <div class="fail"><span class="x">✗</span><p><b>reversal curse不発。</b>「逆転の呪い」を狙ったが、国↔首都ペアは事前学習で双方向に高頻度出現するため呪いがかからない。設計ミス。</p></div>
     <div class="fail"><span class="x">✗</span><p><b>最強経路のホップ数は全60枚で「1」。</b>attribution graphはskip接続支配でホップ数は無意味と判明。代わりに「直接経路の弱さ」が多段推論の指紋になることを発見(転んでもただでは起きない)。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>attentionの直接観測は設計不備で判定不能。</b>最終位置→国トークンのattention量は系列長に汚染され(短い表現ほど大きい)、言い回しの効果と切り分けられなかった。副産物として「同じモデルでもハーネス(TransformerLens直載せ vs circuit-tracer経由)でargmaxが反転する=境界線上のプロンプトは実装の微差に弱い」を発見。</p></div>
     <div class="fail"><span class="x">✗</span><p><b>幻覚誘発は4度目で成立、しかし本検定はほぼ負の結果。</b>3連敗(マイナー首都・逆方向・素のcounting)の後、logprobs事前スクリーニング+few-shot形式でやっと正誤が割れた(n=40: 正答13/誤答27)。だがBH補正後に有意な構造指標はゼロ、n=12で出ていたAUC 0.83は0.73に後退(小標本の幸運)。<b>グラフ要約統計では幻覚検出器は作れない</b>が確定的な結論。</p></div>
     <div class="fail"><span class="x">✗</span><p><b>PCフリーズ事故。</b>37.6GBのtranscoderを32GBのRAMにロードしようとして物理再起動に至った。「ロード前にサイズvsRAMを数値比較」を仕組みとして記録。</p></div>
   </div>
@@ -328,7 +437,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
     <a href="https://www.neuronpedia.org/">Neuronpedia</a>
     <a href="https://github.com/safety-research/circuit-tracer">circuit-tracer</a>
   </div>
-  <p class="note">データ: Neuronpedia生成API(gemma-2-2b, gemmascope-transcoder-16k) + circuit-tracerローカル生成(Qwen3-1.7B/0.6B, RTX 5070 Ti)。分析: NetworkX。2026年6月10–13日、Claude Codeとの共同作業。グラフ本体はリポジトリのmanifest.csvから再取得可能。</p>
+  <p class="note">データ: Neuronpedia生成API(gemma-2-2b, gemmascope-transcoder-16k) + circuit-tracerローカル生成(Qwen3-1.7B/0.6B, RTX 5070 Ti)。分析: NetworkX(グラフ統計) + TransformerLens(線形プローブ・logit lens・MLPアブレーション)。2026年6月10–13日、Claude Codeとの共同作業。グラフ本体はリポジトリのmanifest.csvから再取得可能。</p>
 </footer>
 
 </div>
