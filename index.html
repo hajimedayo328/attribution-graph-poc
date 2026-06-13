@@ -155,7 +155,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   <p class="lede">gemma-2-2bの内部計算を可視化した<strong>attribution graph 156枚</strong>を無料API+手元GPUで集め、NetworkXの統計・検定から<strong>線形プローブ・logit lens・因果介入</strong>まで回した個人研究PoC。終盤では「なぜLLMは文字を数えられないのか」を<strong>観察→分解→介入の三段</strong>で犯人特定まで追い込んだ。<strong>総コスト0円</strong>。成功も失敗も、全部ここにある。</p>
   <div class="stats">
     <div class="stat"><div class="n">156<span style="font-size:1rem">枚</span></div><div class="l">attribution graph<br>gemma 144 + Qwen 12</div></div>
-    <div class="stat"><div class="n">21<span style="font-size:1rem">本</span></div><div class="l">実験A〜U<br>(うち失敗・負の結果7本)</div></div>
+    <div class="stat"><div class="n">22<span style="font-size:1rem">本</span></div><div class="l">実験A〜V<br>(うち失敗・負の結果7本)</div></div>
     <div class="stat"><div class="n">¥0</div><div class="l">Neuronpedia無料API<br>+ 手元GPU</div></div>
     <div class="stat"><div class="n">4<span style="font-size:1rem">日</span></div><div class="l">2026年6月10–13日<br>Claude Codeと共同作業</div></div>
   </div>
@@ -389,7 +389,8 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
     </svg>
     <figcaption>犯人と名指しした終盤MLPを0.5倍に弱めると、モデルは数えるのが上手くなった。観察(logit lens)→分解(寄与)→介入(アブレーション)の三段で因果まで通した、このプロジェクトで最も完結した一本。</figcaption>
   </figure>
-  <div class="caveat"><b>限界:</b> 単一テンプレート・n=84・1モデル。L24-27半減が他のタスク(首都想起など)を壊すか(副作用)は未測定 ── 「counting専用に賢くなった」のか「全体が壊れて偶然合った」のかの切り分けには対照タスクでの検証が必要。</div>
+  <div class="finding"><b>副作用も測った(実験V) ── 改善は局所的:</b> 同じアブレーションを counting 以外にもかけると、首都想起 0.944→1.000・対義語 0.944→0.889・1桁加算 1.000→1.000 と<b>対照タスクはほぼ無傷</b>(counting は +0.119 で再現)。「終盤MLPを弱めると全体が壊れ、counting は偶然合っただけ」という対立仮説は支持されない。<b>+1オーバーシュートは fencepost 計数に特異的</b>で、それを弱めても基本能力は壊れなかった。</div>
+  <div class="caveat"><b>限界:</b> 単一テンプレート・n=84・1モデル・greedy。副作用測定の最大の弱点は<b>天井効果</b> ── 対照タスクの baseline が0.94〜1.0で劣化の検出余地がほぼない(counting は0.45で伸びしろが大きい)。言えるのは「副作用ゼロ」ではなく「基本能力は壊れない」まで。対照各n=16〜18で±1問=±5.6%、対義語の−0.056も首都の+0.056も誤差範囲。</div>
 </section>
 
 <section id="refuted">
