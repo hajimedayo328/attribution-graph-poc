@@ -5,7 +5,7 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
-OUT = Path(__file__).parent / "graphs_qwen06"
+OUT = Path(__file__).parent.parent / "data" / "qwen06"
 CAPS = {"France": "paris", "Japan": "tokyo", "Germany": "berlin", "Egypt": "cairo"}
 PHRASINGS = ["F", "G", "H"]
 
