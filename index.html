@@ -155,7 +155,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   <p class="lede">gemma-2-2bの内部計算を可視化した<strong>attribution graph 156枚</strong>を無料API+手元GPUで集め、NetworkXの統計・検定から<strong>線形プローブ・logit lens・因果介入</strong>まで回した個人研究PoC。終盤では「なぜLLMは文字を数えられないのか」を<strong>観察→分解→介入の三段</strong>で犯人特定まで追い込んだ。<strong>総コスト0円</strong>。成功も失敗も、全部ここにある。</p>
   <div class="stats">
     <div class="stat"><div class="n">156<span style="font-size:1rem">枚</span></div><div class="l">attribution graph<br>gemma 144 + Qwen 12</div></div>
-    <div class="stat"><div class="n">22<span style="font-size:1rem">本</span></div><div class="l">実験A〜V<br>(うち失敗・負の結果7本)</div></div>
+    <div class="stat"><div class="n">24<span style="font-size:1rem">本</span></div><div class="l">実験A〜V(Nは欠番)<br>+ サブ実験3本</div></div>
     <div class="stat"><div class="n">¥0</div><div class="l">Neuronpedia無料API<br>+ 手元GPU</div></div>
     <div class="stat"><div class="n">4<span style="font-size:1rem">日</span></div><div class="l">2026年6月10–13日<br>Claude Codeと共同作業</div></div>
   </div>
@@ -320,8 +320,8 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 
 <section id="counting">
   <h2>🔢 ⑥ なぜLLMは単語の文字を数えられないのか — 誤りを2つの壁に分解</h2>
-  <p class="sub">Qwen3-0.6Bにfew-shotで「'mountain'の文字数は?」と聞くと誤答する。その誤りの正体を、回路のノードレベル分析と入力形式の変換で切り分けた(n=84)。</p>
-  <div class="finding"><b>まず驚いたこと:</b> 誤答に特異的な回路特徴は<b>0個</b>(正答特異的も0個)。正答グラフも誤答グラフも<b>同じ回路部品</b>を使っていた。エラーは「どの部品を使うか」ではなく、同じ回路に<b>流れる値</b>の中にある ── 離散的な回路解析(attribution graphの主戦場)の射程外にある誤りの型。</div>
+  <p class="sub">Qwen3-0.6Bにfew-shotで「'mountain'の文字数は?」と聞くと誤答する。その誤りの正体を、回路のノードレベル分析(実験O)と入力形式の変換(実験P)で切り分けた。</p>
+  <div class="finding"><b>まず驚いたこと:</b> 誤答に特異的な回路特徴は<b>0個</b>(正答特異的も0個、n=40)。正答グラフも誤答グラフも<b>同じ回路部品</b>を使っていた。エラーは「どの部品を使うか」ではなく、同じ回路に<b>流れる値</b>の中にある ── 離散的な回路解析(attribution graphの主戦場)の射程外にある誤りの型。</div>
   <figure class="chart">
     <svg viewBox="0 0 860 190" role="img" aria-label="文字バラし形式による誤答の分解">
       <g transform="translate(200,22)">
@@ -354,7 +354,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
       <polyline class="lens-drop" points="679,68 728,128 776,200"/>
       <circle cx="679" cy="68" r="7" class="dot-yes"/>
       <circle cx="776" cy="200" r="7" class="dot-no"/>
-      <text x="679" y="52" text-anchor="middle" class="bar-value" fill="var(--color-green)">L23付近で浮上(top-1)</text>
+      <text x="679" y="52" text-anchor="middle" class="bar-value" fill="var(--color-green)">中間層で浮上(top-1)</text>
       <text x="768" y="188" text-anchor="end" class="bar-value" fill="var(--color-red)">最終層で消失 →</text>
       <g transform="translate(0,228)">
         <text x="120" y="0" class="axis-label">L0</text>
@@ -364,7 +364,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
       </g>
       <text x="140" y="64" class="bar-value">誤答46件中 <tspan font-weight="700" fill="var(--color-red)">28件(61%)</tspan> でこのパターン</text>
     </svg>
-    <figcaption>各層の中間表現をモデル自身の出力層で復号(logit lens)すると、誤答の61%で正しい数字が中盤(中央値L23)でtop-1に浮上し、最終層までに失われていた。「正解が途中まで来て、消える」のトークンレベルの直接証拠。年の想起では「浮上したら消えない」(0件)で、これはcounting特有。</figcaption>
+    <figcaption>各層の中間表現をモデル自身の出力層で復号(logit lens)すると、誤答の61%で正しい数字が中間層でtop-1に浮上した後、最終層までに失われていた(浮上層の中央値は正答ケースでL23)。「正解が途中まで来て、消える」のトークンレベルの直接証拠。年の想起では「浮上したら消えない」(0件)でこれはcounting特有。<b>※この曲線は浮上→消失の典型形を示す模式図で、層別の実測平均プロットではない。</b></figcaption>
   </figure>
   <div class="finding"><b>線形プローブも同じ結論:</b> 最終位置のresidual streamからリッジ回帰で文字数を予測すると、<b>L24で正答率0.81</b>(±1以内0.99、R²0.94)。<b>モデル自身の出力0.45の倍近く正確</b>で、浅いL4からすでに線形に読める。トークン長交絡(R²0.43)では説明できない。→ <b>countingの失敗は「表現の欠如」ではなく「読み出し(言語化)の失敗」</b>。</div>
 </section>
