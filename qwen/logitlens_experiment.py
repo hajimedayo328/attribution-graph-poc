@@ -67,6 +67,7 @@ def main() -> None:
                         ("years", [(FS_YEAR.format(s), str(y)) for s, y in FACTS])]:
         emergence, correct_flags, lost_cases = [], [], 0
         all_ranks = []
+        lost_ranks = []  # lostケース(中間でtop-1→最終層で失う)限定のrank曲線
         for prompt, target in items:
             ranks, is_top, final_correct = lens_run(model, prompt, target)
             all_ranks.append(ranks)
@@ -77,6 +78,7 @@ def main() -> None:
             # 「途中で正解だったのに最終層で失う」
             if not final_correct and any(is_top):
                 lost_cases += 1
+                lost_ranks.append(ranks)
         acc = np.mean(correct_flags)
         em_ok = [e for e, c in zip(emergence, correct_flags) if c and e is not None]
         print(f"\n===== {task} (n={len(items)}) =====")
@@ -86,10 +88,15 @@ def main() -> None:
         print(f"誤答のうち「中間層では正解がtop-1だったのに失った」: {lost_cases}件")
         # 平均rank曲線(対数)を粗く表示
         mr = np.median(np.array(all_ranks), axis=0)
-        print("正解トークンのrank中央値(層別):")
+        print("正解トークンのrank中央値(層別、全ケース):")
         for layer in range(0, n_layers, 3):
             bar = "#" * max(0, int(12 - np.log2(mr[layer] + 1)))
             print(f"  L{layer:2d}: rank={int(mr[layer]):6d} {bar}")
+        # lostケース限定の全層rank中央値(⑦のグラフ用、浮上→消失を正確に示す)
+        if lost_ranks:
+            lr = np.median(np.array(lost_ranks), axis=0)
+            print(f"[lostケース限定 n={len(lost_ranks)}] 正解トークンrank中央値(全{n_layers}層):")
+            print("  " + ",".join(f"L{layer}={int(lr[layer])}" for layer in range(n_layers)))
         results[task] = (acc, em_ok)
 
 

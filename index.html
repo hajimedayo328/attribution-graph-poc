@@ -343,28 +343,32 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   <h2>🔦 ⑦ でも内部では、正解を知っていた — プローブとlogit lens</h2>
   <p class="sub">出力が間違っていても、中間層の表現には正解が入っているのでは? という問いを2つの方法で覗いた。</p>
   <figure class="chart">
-    <svg viewBox="0 0 860 280" role="img" aria-label="logit lens: 正解の数字が中間層で浮上し最終層で消失する">
-      <line x1="120" y1="40" x2="120" y2="210" class="gridline"/>
-      <line x1="120" y1="210" x2="800" y2="210" class="gridline"/>
-      <text x="112" y="58" text-anchor="end" class="axis-label">高</text>
-      <text x="112" y="208" text-anchor="end" class="axis-label">低</text>
-      <text x="40" y="130" class="axis-label" transform="rotate(-90 40 130)">正解の数字がtop-1に近い度合い</text>
-      <polygon class="lens-fill" points="120,205 266,170 412,128 558,90 679,68 679,210 120,210"/>
-      <polyline class="lens-line" points="120,205 266,170 412,128 558,90 679,68"/>
-      <polyline class="lens-drop" points="679,68 728,128 776,200"/>
-      <circle cx="679" cy="68" r="7" class="dot-yes"/>
-      <circle cx="776" cy="200" r="7" class="dot-no"/>
-      <text x="679" y="52" text-anchor="middle" class="bar-value" fill="var(--color-green)">中間層で浮上(top-1)</text>
-      <text x="768" y="188" text-anchor="end" class="bar-value" fill="var(--color-red)">最終層で消失 →</text>
+    <svg viewBox="0 0 860 280" role="img" aria-label="logit lens実測: 消えた28件で正解トークンの順位が中盤で1位到達後、最終2層で2位に転落">
+      <line x1="120" y1="45" x2="120" y2="210" class="gridline"/>
+      <line x1="120" y1="210" x2="805" y2="210" class="gridline"/>
+      <line x1="120" y1="50" x2="805" y2="50" stroke="var(--color-green)" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+      <line x1="120" y1="114" x2="805" y2="114" class="gridline" opacity="0.6"/>
+      <line x1="120" y1="178" x2="805" y2="178" class="gridline" opacity="0.6"/>
+      <text x="112" y="53" text-anchor="end" class="axis-label">1位</text>
+      <text x="112" y="118" text-anchor="end" class="axis-label">10²位</text>
+      <text x="112" y="182" text-anchor="end" class="axis-label">10⁴位</text>
+      <text x="40" y="135" class="axis-label" transform="rotate(-90 40 135)">正解トークンの順位(中央値・上=1位)</text>
+      <polyline class="lens-line" points="120,210 145,210 170,208 196,197 221,181 246,158 271,183 296,171 322,134 347,147 372,159 397,168 423,159 448,127 473,109 498,97 523,99 549,102 574,106 599,91 624,89 649,79 675,72 700,50 725,50 750,50"/>
+      <polyline class="lens-drop" points="750,50 775,60 800,60"/>
+      <circle cx="700" cy="50" r="6" class="dot-yes"/>
+      <circle cx="800" cy="60" r="6" class="dot-no"/>
+      <text x="690" y="40" text-anchor="middle" class="bar-value" fill="var(--color-green)">L23で1位(top-1)に到達</text>
+      <text x="800" y="80" text-anchor="end" class="bar-value" fill="var(--color-red)">最終2層で2位に転落(rank1)</text>
       <g transform="translate(0,228)">
         <text x="120" y="0" class="axis-label">L0</text>
-        <text x="412" y="0" text-anchor="middle" class="axis-label">L12</text>
-        <text x="679" y="0" text-anchor="middle" class="axis-label">L23</text>
-        <text x="800" y="0" text-anchor="end" class="axis-label">L27(出力)</text>
+        <text x="347" y="0" text-anchor="middle" class="axis-label">L9</text>
+        <text x="574" y="0" text-anchor="middle" class="axis-label">L18</text>
+        <text x="700" y="0" text-anchor="middle" class="axis-label">L23</text>
+        <text x="805" y="0" text-anchor="end" class="axis-label">L27(出力)</text>
       </g>
-      <text x="140" y="64" class="bar-value">誤答46件中 <tspan font-weight="700" fill="var(--color-red)">28件(61%)</tspan> でこのパターン</text>
+      <text x="140" y="70" class="bar-value">消えた <tspan font-weight="700" fill="var(--color-red)">28件(誤答の61%)</tspan> の中央値プロファイル</text>
     </svg>
-    <figcaption>各層の中間表現をモデル自身の出力層で復号(logit lens)すると、誤答の61%で正しい数字が中間層でtop-1に浮上した後、最終層までに失われていた(浮上層の中央値は正答ケースでL23)。「正解が途中まで来て、消える」のトークンレベルの直接証拠。年の想起では「浮上したら消えない」(0件)でこれはcounting特有。<b>※この曲線は浮上→消失の典型形を示す模式図で、層別の実測平均プロットではない。</b></figcaption>
+    <figcaption>各層の中間表現を出力層で復号(logit lens)し、最終層で正解を落とした28件(誤答の61%)に限定して正解トークンの順位の中央値を追った<b>実測プロット</b>。<b>中盤(L23)で正解は内部的に1位(top-1)へ到達するが、最終2層で2位に転落して誤答に競り負ける</b>。派手に消えるのではなく「1位まで来て+1の答えに僅差で抜かれる」── 実験⑧で犯人と特定した終盤MLPの+1オーバーシュートが、この最後の転落の正体。年の想起ではこの転落は0件。</figcaption>
   </figure>
   <div class="finding"><b>線形プローブも同じ結論:</b> 最終位置のresidual streamからリッジ回帰で文字数を予測すると、<b>L24で正答率0.81</b>(±1以内0.99、R²0.94)。<b>モデル自身の出力0.45の倍近く正確</b>で、浅いL4からすでに線形に読める。トークン長交絡(R²0.43)では説明できない。→ <b>countingの失敗は「表現の欠如」ではなく「読み出し(言語化)の失敗」</b>。</div>
 </section>
