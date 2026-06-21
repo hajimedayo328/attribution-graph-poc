@@ -393,8 +393,38 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
     </svg>
     <figcaption>犯人と名指しした終盤MLPを0.5倍に弱めると、モデルは数えるのが上手くなった。観察(logit lens)→分解(寄与)→介入(アブレーション)の三段で因果まで通した、このプロジェクトで最も完結した一本。</figcaption>
   </figure>
-  <div class="finding"><b>副作用も測った(実験V) ── 改善は局所的:</b> 同じアブレーションを counting 以外にもかけると、首都想起 0.944→1.000・対義語 0.944→0.889・1桁加算 1.000→1.000 と<b>対照タスクはほぼ無傷</b>(counting は +0.119 で再現)。「終盤MLPを弱めると全体が壊れ、counting は偶然合っただけ」という対立仮説は支持されない。<b>+1オーバーシュートは fencepost 計数に特異的</b>で、それを弱めても基本能力は壊れなかった。</div>
-  <div class="caveat"><b>限界:</b> 単一テンプレート・n=84・1モデル・greedy。副作用測定の最大の弱点は<b>天井効果</b> ── 対照タスクの baseline が0.94〜1.0で劣化の検出余地がほぼない(counting は0.45で伸びしろが大きい)。言えるのは「副作用ゼロ」ではなく「基本能力は壊れない」まで。対照各n=16〜18で±1問=±5.6%、対義語の−0.056も首都の+0.056も誤差範囲。</div>
+  <div class="finding"><b>だが「無害」ではなかった ── これはトレードオフ(実験V-3で自己訂正):</b> 最初の副作用測定(実験V)は対照タスクが易しすぎ(全部 baseline 0.94以上=天井効果)で副作用を見逃していた。難しい対照で測り直すと、L24-27×0.5は<b>3桁の繰り上がり加算を −0.200・中堅国の首都想起を −0.156</b> 壊していた(greedy=決定的なので統計ノイズではない実効果)。終盤MLPは「counting専用の悪者」ではなく、<b>多段の桁上がりや精密な事実想起にも使う共有資源</b>だった。</div>
+  <figure class="chart">
+    <svg viewBox="0 0 860 195" role="img" aria-label="アブレーション強度ごとのトレードオフ: counting改善 vs 副作用">
+      <text x="445" y="16" text-anchor="end" class="axis-label">← 副作用(他タスクの損)</text>
+      <text x="495" y="16" class="axis-label">counting改善(得) →</text>
+      <line x1="470" y1="24" x2="470" y2="168" stroke="var(--color-muted)" stroke-width="1.5"/>
+      <text x="470" y="184" text-anchor="middle" class="axis-label">0</text>
+      <!-- L24-27×0.7: 純益+0.021 (緑=44 / 赤=26) -->
+      <g transform="translate(0,40)">
+        <rect x="444" y="0" width="26" height="20" class="bar-red"/>
+        <rect x="470" y="0" width="44" height="20" class="bar-green"/>
+        <text x="610" y="14" class="bar-value" fill="var(--color-green)">L24-27×0.7 ⟶ 純益 +0.021 ◎</text>
+      </g>
+      <!-- L25のみ×0.5: 純益-0.011 -->
+      <g transform="translate(0,80)">
+        <rect x="417" y="0" width="53" height="20" class="bar-red"/>
+        <rect x="470" y="0" width="44" height="20" class="bar-green"/>
+        <text x="610" y="14" class="bar-value">L25のみ×0.5 ⟶ 純益 −0.011</text>
+      </g>
+      <!-- L24-27×0.5(U/Vの設定): 純益-0.201 -->
+      <g transform="translate(0,120)">
+        <rect x="167" y="0" width="303" height="20" class="bar-red"/>
+        <rect x="470" y="0" width="132" height="20" class="bar-green"/>
+        <text x="170" y="-4" class="bar-value" fill="var(--color-red)">巻き添え合計 −0.356</text>
+        <text x="476" y="14" class="bar-value" fill="white">+0.155</text>
+        <text x="610" y="14" class="bar-value" fill="var(--color-red)">L24-27×0.5(U/Vの設定) ⟶ 純益 −0.201 ✗</text>
+      </g>
+    </svg>
+    <figcaption>横軸は無介入からの正答率変化。緑=countingの改善(得)、赤=3桁加算+首都想起の劣化(損)。実験U/Vが使った L24-27×0.5 は最大の+0.155と引き換えに巻き添え−0.356で<b>純益マイナス</b>。介入を ×0.7 に緩めると counting+0.052 を保ちつつ副作用がほぼ消え、唯一の純益プラス(+0.021)になる。トレードオフは連続的で、最適点は控えめな弱体化だった。</figcaption>
+  </figure>
+  <div class="finding"><b>教訓:</b> 「終盤MLPを弱めれば数えられる」は真。だが派手な「+12pt」は副作用込みで評価すべきで、実態は<b>強さで調整できるトレードオフ</b>。最初の実験Vで「ほぼ無害」と結論したのは対照タスクが易しすぎたため ── 難度を上げて初めて副作用が見えた。</div>
+  <div class="caveat"><b>限界:</b> 単一テンプレート・1モデル・greedy。Qwen3-0.6Bは2桁算術・2桁×1桁乗算まで満点で、中域 baseline の対照を作れず劣化は天井付近(0.97→0.81等)で観測。effectは大きく決定的だが、各タスク n=20〜32 と小規模。</div>
 </section>
 
 <section id="refuted">
