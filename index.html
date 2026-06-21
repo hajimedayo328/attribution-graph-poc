@@ -436,18 +436,19 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
         <text x="-12" y="14" text-anchor="end" class="bar-label" font-weight="600">文字数<tspan x="-12" dy="16">(counting)</tspan></text>
         <rect x="0" y="2" width="216" height="16" class="bar-amber"/><text x="10" y="15" class="bar-value" fill="white">出力 正答率 0.45</text>
         <rect x="0" y="22" width="451" height="16" class="bar-green"/><text x="10" y="35" class="bar-value" fill="white">内部プローブ R²0.94</text>
-        <text x="461" y="28" class="bar-value" fill="var(--color-green)" font-weight="700">内部 &gt; 出力</text>
+        <text x="461" y="28" class="bar-value" fill="var(--color-green)" font-weight="700">内部 ≫ 出力 (差0.49)</text>
         <text x="-12" y="98" text-anchor="end" class="bar-label" font-weight="600">年の想起<tspan x="-12" dy="16">(recall)</tspan></text>
         <rect x="0" y="86" width="326" height="16" class="bar-amber"/><text x="10" y="99" class="bar-value" fill="white">出力 正答率 0.68</text>
-        <rect x="0" y="106" width="245" height="16" class="bar-red"/><text x="10" y="119" class="bar-value" fill="white">内部プローブ R²0.51</text>
-        <text x="461" y="112" class="bar-value" fill="var(--color-red)" font-weight="700">出力 &gt; 内部</text>
+        <rect x="0" y="106" width="288" height="16" class="bar-amber"/><text x="10" y="119" class="bar-value" fill="white">内部プローブ R²0.60</text>
+        <text x="461" y="112" class="bar-value" fill="var(--color-amber)" font-weight="700">内部 ≈ 出力 (差0.08)</text>
       </g>
-      <text x="430" y="196" text-anchor="middle" class="bar-value" font-weight="700" fill="var(--color-purple)">逆転</text>
-      <text x="430" y="217" text-anchor="middle" class="axis-label">出力=正答率 / 内部=線形プローブのR²(別単位、傾向の対比として)</text>
+      <text x="430" y="196" text-anchor="middle" class="bar-value" font-weight="700" fill="var(--color-purple)">内部優位ギャップの有無</text>
+      <text x="430" y="217" text-anchor="middle" class="axis-label">出力=正答率 / 内部=線形プローブR²(年は0.60±0.16、n=60で不安定)。別単位の傾向対比</text>
     </svg>
-    <figcaption>countingは「内部表現 &gt; 出力」、年の想起は「出力 &gt; 内部プローブ」。統一テーマは1回目の一般化テストで境界線が引かれた。仮説が検証可能な形で立っていた証拠でもある。</figcaption>
+    <figcaption>countingは内部表現が出力を大きく上回る(知ってるのに言えない)。年は内部≈出力で「隠れた知識」の優位がほぼ無い ── この<b>内部優位ギャップの有無</b>が2系統の差。統一テーマ「失敗=読み出しの失敗」は年では成り立たず、1回目の一般化テストで境界線が引かれた。※年のR²は0.60±0.16(n=60で不安定)で、実験S初出の0.51は低めの一引きだった。</figcaption>
   </figure>
-  <div class="finding"><b>logit lensが謎を解いた ── 数値知識は2系統:</b> 文字数は浅い層(L4)から<b>線形の「数直線」</b>として存在し(プローブが読める)、L15以降で数字トークン方向に変換される(この変換が61%失敗=実験⑦)。一方、年は線形の数直線としては存在せず、<b>カテゴリカルなトークン方向</b>として深層で一気に具現化する(線形回帰では読めないがlogit lensでは見える)。「読み出しの失敗」は普遍法則ではなく<b>タスク依存</b>だった。</div>
+  <div class="finding"><b>数値知識は2系統 ── ただし二分でなくグラデーション:</b> 文字数は浅い層(L4)から<b>線形の「数直線」</b>として強く存在し(プローブR²0.94)、L15以降で数字トークン方向に変換される(この変換が61%失敗=実験⑦)。年は線形成分が弱く(R²0.60)、深層で<b>カテゴリカルに具現化</b>する。当初「年は読めない(R²0.51)」と書いたが、再検証で0.60±0.16の不安定値と判明 ── 「読めない」ではなく「countingほど強く線形でない」が正確。</div>
+  <div class="finding"><b>2系統説の主柱はlogit lens(実験⑦)の方:</b> プローブのR²差はn=60で不安定なので副次証拠に格下げ。より頑健なのは「countingは正解が浮上→消失(61%)、年は浮上したら消えない(0%)」という質的差。追検証(実験S-2)では、年も<b>生成が進むと僅かに線形化</b>(step0→step2でR²0.60→0.67、ただし誤差±0.16内)── 年は生成途中で徐々に形になる気配。</div>
 </section>
 
 <section id="fails">
