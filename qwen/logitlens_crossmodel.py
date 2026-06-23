@@ -8,6 +8,7 @@ import torch
 from transformer_lens import HookedTransformer
 
 from logitlens_experiment import WORDS, FS_COUNT, FACTS, FS_YEAR, lens_run
+from ram_guard import start_watchdog, assert_safe_to_load
 
 MODEL = sys.argv[1] if len(sys.argv) > 1 else "Qwen/Qwen3-1.7B"
 
@@ -31,7 +32,9 @@ def run_task(model, items, n_layers):
 
 
 def main() -> None:
-    print(f"=== {MODEL} (logit lens, transcoder不要=RAM安全) ===")
+    print(f"=== {MODEL} (logit lens) ===")
+    start_watchdog(80)              # 80%超で自己終了(フリーズ前に止める物理ガード)
+    assert_safe_to_load(MODEL)     # 推定peak > 空きRAM なら中止(gemma F32等を弾く)
     model = HookedTransformer.from_pretrained(MODEL, dtype=torch.bfloat16)
     model.eval()
     nl = model.cfg.n_layers
