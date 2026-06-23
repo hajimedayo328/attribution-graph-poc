@@ -53,9 +53,10 @@ def _checkpoint_bytes(model_name: str) -> int:
     try:
         from huggingface_hub import HfApi
         info = HfApi().model_info(model_name, files_metadata=True)
-        tot = sum((s.size or 0) for s in info.siblings
-                  if s.rfilename.endswith((".safetensors", ".bin")))
-        return tot
+        # 同一重みが .safetensors と .bin で重複する場合の二重計上を防ぐ(safetensors優先)
+        st = sum((s.size or 0) for s in info.siblings if s.rfilename.endswith(".safetensors"))
+        bn = sum((s.size or 0) for s in info.siblings if s.rfilename.endswith(".bin"))
+        return st if st > 0 else bn
     except Exception as e:  # noqa: BLE001
         print(f"[RAM-GUARD] サイズ照会失敗({e})。watchdogのみで進む")
         return 0
