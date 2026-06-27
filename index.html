@@ -139,6 +139,14 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+.tabbar { display:flex; gap:2px; margin-top:var(--space-lg); border-bottom:var(--rule); flex-wrap:wrap; }
+.tab { appearance:none; background:none; border:none; cursor:pointer; font-family:var(--font-body); font-size:var(--text-sm); color:var(--color-muted); padding:var(--space-sm) var(--space-md); border-bottom:2px solid transparent; margin-bottom:-1px; line-height:1.4; }
+.tab:hover { color:var(--color-ink); }
+.tab.active { color:var(--color-ink); font-weight:650; border-bottom-color:var(--color-accent); }
+.tab:focus-visible { outline:2px solid var(--color-focus); outline-offset:2px; border-radius:2px; }
+.panel.hidden { display:none; }
+#jp-feasible .finding { background:var(--color-green-soft); border-left-color:var(--color-green); }
+#jp-kill .finding { background:var(--color-red-soft); border-left-color:var(--color-red); }
 </style>
 </head>
 <body>
@@ -149,7 +157,13 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   <a class="gh" href="https://github.com/hajimedayo328/attribution-graph-poc">GitHub →</a>
 </header>
 
+<nav class="tabbar" role="tablist" aria-label="研究の切り替え">
+  <button class="tab active" role="tab" aria-selected="true" data-panel="panel-main">本研究 — Attribution / Counting</button>
+  <button class="tab" role="tab" aria-selected="false" data-panel="panel-jp">番外 — 日本語×LLM 音符(否定結果)</button>
+</nav>
+
 <main>
+<div class="panel" id="panel-main">
 <div class="hero">
   <h1>LLMの思考回路を、グラフ理論で読んでみた</h1>
   <p class="lede">gemma-2-2bの内部計算を可視化した<strong>attribution graph 156枚</strong>を無料API+手元GPUで集め、NetworkXの統計・検定から<strong>線形プローブ・logit lens・因果介入</strong>まで回した個人研究PoC。終盤では「なぜLLMは文字を数えられないのか」を<strong>観察→分解→介入の三段</strong>で犯人特定まで追い込んだ。<strong>総コスト0円</strong>。成功も失敗も、全部ここにある。</p>
@@ -465,6 +479,101 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   </div>
   <div class="caveat"><b>このページ全体への注意:</b> n=10前後/群・単一〜2モデル・自作プロンプトによる探索的結果であり、すべて「研究の種」。attribution graph自体が置換モデルの近似(誤差ノード8〜11%)で、見ているのは「解釈しやすく作り直した影」である点も含め、確定的な主張はひとつもない。検定はMann-Whitney U + BH補正、詳細は<a href="https://github.com/hajimedayo328/attribution-graph-poc/blob/main/RESULTS.md">RESULTS.md</a>。</div>
 </section>
+</div><!-- /panel-main -->
+
+<div class="panel hidden" id="panel-jp">
+
+<div class="hero">
+  <h1>番外編：もっともらしい信号を、信じる前に殺す</h1>
+  <p class="lede">日本語ネイティブの利が効く問いとして「<strong>日本語LLMは漢字の音符(同じ音を表す部品。青→清・晴・精…)の構造を内部に持つか</strong>」を立てた。一度は「持つ、しかも規模で強まる」信号(z=3.6, p&lt;.01)が出た。だが厳密な対照とストレステストにかけたら<strong>崩れた</strong>。これは発見の記録ではなく、<strong>自分を騙さないための検証手続き</strong>の記録 — 手法こそが成果。</p>
+  <div class="stats">
+    <div class="stat"><div class="n">2<span style="font-size:1rem">モデル</span></div><div class="l">LLM-jp-3<br>1.8B / 3.7B</div></div>
+    <div class="stat"><div class="n">1000<span style="font-size:1rem">回</span></div><div class="l">置換検定<br>permutation null</div></div>
+    <div class="stat"><div class="n">z3.6</div><div class="l">→ ストレスで<br>1.4〜−0.2に崩壊</div></div>
+    <div class="stat"><div class="n">¥0</div><div class="l">手元GPU<br>RTX 5070 Ti</div></div>
+  </div>
+</div>
+
+<section id="jp-feasible">
+  <h2>🧪 番外① まず「読めるモデル」を選ぶ</h2>
+  <p class="sub">漢字の音/訓読みを扱えないモデルでは機構を調べる意味がない。同じ12語(生命/生卵など音訓ペア)で読みの正答を測った。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 150" role="img" aria-label="漢字読みの正答: Qwen3-4B 3/12 vs LLM-jp-3-1.8b 10/12">
+      <g transform="translate(190,20)">
+        <line x1="0" y1="2" x2="0" y2="104" class="gridline"/>
+        <text x="-10" y="26" text-anchor="end" class="bar-label">Qwen3-4B(多言語)</text>
+        <rect x="0" y="14" width="150" height="22" class="bar-red"/><text x="158" y="30" class="bar-value">3 / 12</text>
+        <text x="-10" y="80" text-anchor="end" class="bar-label">LLM-jp-3-1.8b(日本語)</text>
+        <rect x="0" y="68" width="500" height="22" class="bar-green"/><text x="508" y="84" class="bar-value">10 / 12(実質12)</text>
+      </g>
+    </svg>
+    <figcaption>中華製の多言語Qwenは日本語の漢字読みを持たない(生命→「いきょう」等のでたらめ)。日本語特化のLLM-jpは音/訓を区別できた。以降はLLM-jpを使用。</figcaption>
+  </figure>
+  <div class="finding"><b>含意:</b> 「面白い問い」の前に「そのモデルがタスクをこなせるか」を数字で確認する。能力が無ければ機構も無い。</div>
+</section>
+
+<section id="jp-signal">
+  <h2>🧩 番外② 音符構造はあるか — 一度は出た信号</h2>
+  <p class="sub">音符を共有するが意味が異なる漢字群(青→清/晴/精)が埋め込み空間で固まるかを、群内−群外の類似度で測る。意味群(動物/数/色)を対照に、次元ごとz-score(巨大次元の支配を除去)+1000回の置換null。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 200" role="img" aria-label="群内マイナス群外の類似度: 意味は強く音符は微小ランダムはゼロ">
+      <g transform="translate(150,10)">
+        <line x1="0" y1="-2" x2="0" y2="150" class="gridline"/>
+        <text x="-10" y="13" text-anchor="end" class="bar-label" font-weight="600">意味群(対照)</text>
+        <rect x="0" y="2" width="388" height="13" class="bar-green"/><text x="396" y="12" class="bar-value">0.323 (1.8B)</text>
+        <rect x="0" y="19" width="395" height="13" class="bar-green" opacity="0.55"/><text x="403" y="29" class="bar-value">0.329 (3.7B)</text>
+        <text x="-10" y="73" text-anchor="end" class="bar-label" font-weight="600">音符群</text>
+        <rect x="0" y="62" width="32" height="13" class="bar-main"/><text x="40" y="72" class="bar-value">0.027 (1.8B)</text>
+        <rect x="0" y="79" width="54" height="13" class="bar-main" opacity="0.55"/><text x="62" y="89" class="bar-value">0.045 (3.7B)</text>
+        <text x="-10" y="133" text-anchor="end" class="bar-label" font-weight="600">ランダム群</text>
+        <rect x="0" y="122" width="3" height="13" class="bar-muted"/><text x="11" y="132" class="bar-value">≈0.00</text>
+        <text x="0" y="172" class="axis-label">群内−群外の平均コサイン類似度(大きいほど固まる)</text>
+      </g>
+    </svg>
+    <figcaption>意味群は強く固まる(=手法が正しく動く対照)。音符群は微小だが、置換検定では<b>1.8B z=2.9 / 3.7B z=3.6 (ともにp&lt;.01)</b>で偶然を超え、しかも規模で増加。「構成構造が創発?」と一瞬見えた。</figcaption>
+  </figure>
+</section>
+
+<section id="jp-kill">
+  <h2>💀 番外③ ストレステストで殺す</h2>
+  <p class="sub">弱い信号ほど疑う。①意味も共有する群(青=清/晴/静は「澄む」)を外す ②群を多様に拡張 ③一番効いてる上位3群を抜く。本物なら耐えるはず。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 220" role="img" aria-label="ストレスでz値が崩壊しz=2の有意ラインを割る">
+      <g transform="translate(150,16)">
+        <line x1="300" y1="0" x2="300" y2="176" stroke="var(--color-red)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="300" y="192" text-anchor="middle" class="axis-label" fill="var(--color-red)">z=2 有意ライン</text>
+        <text x="-10" y="13" text-anchor="end" class="bar-label" font-weight="600">1.8B</text>
+        <text x="-10" y="33" text-anchor="end" class="bar-label">full(10群)</text>
+        <rect x="0" y="22" width="435" height="12" class="bar-main"/><text x="443" y="32" class="bar-value">2.9</text>
+        <text x="-10" y="51" text-anchor="end" class="bar-label">青(意味)除外</text>
+        <rect x="0" y="40" width="285" height="12" class="bar-amber"/><text x="293" y="50" class="bar-value">1.9</text>
+        <text x="-10" y="69" text-anchor="end" class="bar-label">上位3群除外</text>
+        <rect x="0" y="58" width="2" height="12" class="bar-red"/><text x="10" y="68" class="bar-value">−0.2 消滅</text>
+        <text x="-10" y="107" text-anchor="end" class="bar-label" font-weight="600">3.7B</text>
+        <text x="-10" y="127" text-anchor="end" class="bar-label">full(10群)</text>
+        <rect x="0" y="116" width="540" height="12" class="bar-main"/><text x="548" y="126" class="bar-value">3.6</text>
+        <text x="-10" y="145" text-anchor="end" class="bar-label">青(意味)除外</text>
+        <rect x="0" y="134" width="375" height="12" class="bar-amber"/><text x="383" y="144" class="bar-value">2.5</text>
+        <text x="-10" y="163" text-anchor="end" class="bar-label">上位3群除外</text>
+        <rect x="0" y="152" width="210" height="12" class="bar-red"/><text x="218" y="162" class="bar-value">1.4 ライン割れ</text>
+      </g>
+    </svg>
+    <figcaption>意味コヒーレントな群(青)が最大の支柱＝残留意味の混入が実在。多様化＋上位群除外で<b>1.8Bは消滅(z=−0.2)、3.7Bも有意ライン割れ(z=1.4)</b>。群構成でz±1動く＝ノイズ優勢。</figcaption>
+  </figure>
+  <div class="finding"><b>結論(否定):</b> 日本語LLMは漢字を<b>意味</b>で表現するが、<b>音符の構成構造はrobustには持たない</b>。見かけの弱信号は一部系列の残留意味で説明でき、ストレステストに耐えない。</div>
+</section>
+
+<section id="jp-deadend">
+  <h2>🧱 番外④ もう一つの行き止まり：漢字の読み機構</h2>
+  <p class="sub">「文脈が漢字の読みをどの層で決めるか」も狙ったが、二重に詰んだ。</p>
+  <div class="fails">
+    <div class="fail"><span class="x">✗</span><p><b>表層の混入。</b>最終トークンで音/訓は第0層(埋め込み)から82%解読可＝字面(送り仮名・字種)で分かるだけ。深層で精度は上がらず「決定層」は存在しなかった。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>トークナイザに撃墜。</b>混入を消す設計(対象を熟語の2文字目に固定し同一トークン化)を組んだが、熟語の10/14が1トークンに融合(三人→「三人」)。「同じトークン」前提が崩れ、測定不能。</p></div>
+  </div>
+  <div class="caveat"><b>この番外編への注意:</b> n≈40漢字・10〜11群・2モデル・音符ラベルは自作(辞書未検証)の探索的結果。確定的主張は「<b>この設定では音符構造はrobustに検出されない</b>」という否定のみ。本物にするには辞書検証済みの意味多様な系列20+、規模3点目(13B)、独立な意味尺度での回帰除去が要る。コード一式はローカル(dev/llm-connectome)に保持。</div>
+</section>
+
+</div><!-- /panel-jp -->
 </main>
 
 <footer class="site">
@@ -478,5 +587,20 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 </footer>
 
 </div>
+<script>
+(function(){
+  var tabs = document.querySelectorAll('.tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.classList.remove('active'); x.setAttribute('aria-selected','false'); });
+      document.querySelectorAll('.panel').forEach(function(p){ p.classList.add('hidden'); });
+      t.classList.add('active'); t.setAttribute('aria-selected','true');
+      var el = document.getElementById(t.getAttribute('data-panel'));
+      if (el) { el.classList.remove('hidden'); }
+      window.scrollTo(0, 0);
+    });
+  });
+})();
+</script>
 </body>
 </html>
