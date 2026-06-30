@@ -147,6 +147,9 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
 .panel.hidden { display:none; }
 #jp-feasible .finding { background:var(--color-green-soft); border-left-color:var(--color-green); }
 #jp-kill .finding { background:var(--color-red-soft); border-left-color:var(--color-red); }
+#jp-revive .finding { background:var(--color-amber-soft); border-left-color:var(--color-amber); }
+#jp-keigo .finding { background:var(--color-green-soft); border-left-color:var(--color-green); }
+#jp-summary .finding { background:var(--color-blue-soft); border-left-color:var(--color-blue); }
 </style>
 </head>
 <body>
@@ -570,7 +573,127 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
     <div class="fail"><span class="x">✗</span><p><b>表層の混入。</b>最終トークンで音/訓は第0層(埋め込み)から82%解読可＝字面(送り仮名・字種)で分かるだけ。深層で精度は上がらず「決定層」は存在しなかった。</p></div>
     <div class="fail"><span class="x">✗</span><p><b>トークナイザに撃墜。</b>混入を消す設計(対象を熟語の2文字目に固定し同一トークン化)を組んだが、熟語の10/14が1トークンに融合(三人→「三人」)。「同じトークン」前提が崩れ、測定不能。</p></div>
   </div>
-  <div class="caveat"><b>この番外編への注意:</b> n≈40漢字・10〜11群・2モデル・音符ラベルは自作(辞書未検証)の探索的結果。確定的主張は「<b>この設定では音符構造はrobustに検出されない</b>」という否定のみ。本物にするには辞書検証済みの意味多様な系列20+、規模3点目(13B)、独立な意味尺度での回帰除去が要る。コード一式はローカル(dev/llm-connectome)に保持。</div>
+  <div class="caveat"><b>ここまでの整理:</b> 音符は線形ではrobustに検出されず、漢字の読み機構は測定設計の壁で詰まった。「日本語LLMにこの種の機構は無い」と書きかけたが — <b>下の番外⑤で位相を当てたら結論が反転した</b>。線形で見えないものが高次幾何にはある、という話に転がった。</div>
+</section>
+
+<section id="jp-revive">
+  <h2>🔁 番外⑤ 殺したはずの音符が、位相で蘇る</h2>
+  <p class="sub">線形で死んだ音符構造を、Persistent Homology (PH) で測り直した。同サイズランダム部分集合と比較した permutation 検定 (200回)。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 250" role="img" aria-label="PHのz値: 音符は3層全部でz>3、意味は逆方向で凝縮">
+      <g transform="translate(150,10)">
+        <line x1="0" y1="0" x2="0" y2="220" class="gridline"/>
+        <line x1="250" y1="0" x2="250" y2="220" stroke="var(--color-red)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="250" y="236" text-anchor="middle" class="axis-label" fill="var(--color-red)">z=2 有意ライン</text>
+        <text x="-10" y="13" text-anchor="end" class="bar-label" font-weight="600">音符 H_1 (ループ)</text>
+        <text x="-10" y="31" text-anchor="end" class="bar-label">L7 浅</text>
+        <rect x="0" y="20" width="362" height="14" class="bar-main"/><text x="370" y="31" class="bar-value">z=+2.9</text>
+        <text x="-10" y="51" text-anchor="end" class="bar-label">L14 中</text>
+        <rect x="0" y="40" width="462" height="14" class="bar-main"/><text x="470" y="51" class="bar-value">z=+3.7</text>
+        <text x="-10" y="71" text-anchor="end" class="bar-label">L23 深</text>
+        <rect x="0" y="60" width="462" height="14" class="bar-main"/><text x="470" y="71" class="bar-value">z=+3.7</text>
+        <text x="-10" y="103" text-anchor="end" class="bar-label" font-weight="600">音符 H_0 (拡散)</text>
+        <text x="-10" y="121" text-anchor="end" class="bar-label">L7 浅</text>
+        <rect x="0" y="110" width="437" height="14" class="bar-amber"/><text x="445" y="121" class="bar-value">z=+3.5</text>
+        <text x="-10" y="141" text-anchor="end" class="bar-label">L14 中</text>
+        <rect x="0" y="130" width="412" height="14" class="bar-amber"/><text x="420" y="141" class="bar-value">z=+3.3</text>
+        <text x="-10" y="161" text-anchor="end" class="bar-label">L23 深</text>
+        <rect x="0" y="150" width="400" height="14" class="bar-amber"/><text x="408" y="161" class="bar-value">z=+3.2</text>
+        <text x="-10" y="193" text-anchor="end" class="bar-label" font-weight="600">意味 H_1 (逆方向)</text>
+        <text x="-10" y="211" text-anchor="end" class="bar-label">L7-23 全層</text>
+        <rect x="-275" y="200" width="275" height="14" class="bar-base"/><text x="-283" y="211" text-anchor="end" class="bar-value">z=−2.1〜−2.3</text>
+      </g>
+    </svg>
+    <figcaption>音符は random と「拡散」「ループ」の両方で有意に異なる方向(z=+3前後)＝<b>幾何的に高次構造を持つ</b>。意味は逆方向で凝縮(z≈−2.2)＝同義語は密集する(直感通り)。両群とも random ではない、しかも<b>質的に違う形</b>。</figcaption>
+  </figure>
+  <figure class="chart">
+    <svg viewBox="0 0 860 200" role="img" aria-label="PH LOO: 1音符群除外でz>2が9/10維持、干だけギリ割れ">
+      <g transform="translate(150,10)">
+        <text x="0" y="14" class="bar-label" font-weight="600">L14 音符 H_1 z値の LOO 分布(10音符群を1つずつ除外)</text>
+        <line x1="40" y1="30" x2="40" y2="155" stroke="var(--color-red)" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="40" y="172" text-anchor="middle" class="axis-label" fill="var(--color-red)">z=2 ライン</text>
+        <g transform="translate(0,40)">
+          <text x="-10" y="10" text-anchor="end" class="bar-label">baseline</text>
+          <rect x="0" y="0" width="180" height="12" class="bar-main"/><text x="188" y="10" class="bar-value">z=+3.6</text>
+        </g>
+        <g transform="translate(0,60)">
+          <text x="-10" y="10" text-anchor="end" class="bar-label">LOO 中央値</text>
+          <rect x="0" y="0" width="155" height="12" class="bar-amber"/><text x="163" y="10" class="bar-value">z=+3.1</text>
+        </g>
+        <g transform="translate(0,80)">
+          <text x="-10" y="10" text-anchor="end" class="bar-label">LOO 最高(−方)</text>
+          <rect x="0" y="0" width="200" height="12" class="bar-green"/><text x="208" y="10" class="bar-value">z=+4.0 ノイズ抜けて上昇</text>
+        </g>
+        <g transform="translate(0,100)">
+          <text x="-10" y="10" text-anchor="end" class="bar-label">LOO 最低(−干)</text>
+          <rect x="0" y="0" width="38" height="12" class="bar-red"/><text x="46" y="10" class="bar-value">z=+1.9 ギリ割れ</text>
+        </g>
+        <text x="0" y="143" class="axis-label">→ <b>9/10 LOO で z>2 維持</b>。線形stress(支柱3群除外でz=−0.2/1.4まで全崩壊)より遥かに頑健</text>
+      </g>
+    </svg>
+    <figcaption>音符1群を抜いてもPH信号は大半残る。線形stressは支柱を抜くと信号自体が消えたが、位相は別の音符群がループを担う。「方」を抜くと逆にz=+4.0で上昇＝そのノイズだった音符を抜くと構造が綺麗になる。</figcaption>
+  </figure>
+  <div class="finding"><b>含意:</b> 「LLMは音符構造を持たない」と線形だけで結論すると間違える。<b>線形空間では分離不可だが、高次の幾何(ループ・拡散)としてはrobustに保持される</b>。これは確証可能性研究全般の警告 — 評価が線形偏重なら「持ってない」と誤判定する。Mapper 可視化でも純度 z=+3.6 で確認。</div>
+</section>
+
+<section id="jp-keigo">
+  <h2>✨ 番外⑥ 敬語要請：4段の検定を生き残った信号</h2>
+  <p class="sub">「文脈に上位者(先生/お客様/社長…)が出ると、後の動詞前の表現が敬語準備モードになるか」。同一トークン「を」位置で probe → stress → LOO → 因果介入(MLP ablate)の順に検定した。LLM-jp-3-3.7b。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 290" role="img" aria-label="4段検定: probe/stress/LOO/ablateで一貫した生存信号">
+      <g transform="translate(170,10)">
+        <text x="-10" y="13" text-anchor="end" class="bar-label" font-weight="600">① 線形 probe</text>
+        <text x="-10" y="31" text-anchor="end" class="bar-label">浅層(L_early)</text>
+        <rect x="0" y="20" width="114" height="14" class="bar-base"/><text x="122" y="31" class="bar-value">0.57 表層混入で低い</text>
+        <text x="-10" y="51" text-anchor="end" class="bar-label">中層(L_mid)</text>
+        <rect x="0" y="40" width="320" height="14" class="bar-main"/><text x="328" y="51" class="bar-value">0.80</text>
+        <text x="-10" y="71" text-anchor="end" class="bar-label">深層(L_late)</text>
+        <rect x="0" y="60" width="400" height="14" class="bar-main"/><text x="408" y="71" class="bar-value">0.90 深層で抽出</text>
+        <text x="-10" y="103" text-anchor="end" class="bar-label" font-weight="600">② Stress test</text>
+        <text x="-10" y="121" text-anchor="end" class="bar-label">職業ペア統制</text>
+        <rect x="0" y="110" width="400" height="14" class="bar-main"/><text x="408" y="121" class="bar-value">0.90 維持(社長/部下,医師/看護師…でも)</text>
+        <text x="-10" y="153" text-anchor="end" class="bar-label" font-weight="600">③ LOO (主体除外)</text>
+        <text x="-10" y="171" text-anchor="end" class="bar-label">median</text>
+        <rect x="0" y="160" width="395" height="14" class="bar-main"/><text x="403" y="171" class="bar-value">0.89</text>
+        <text x="-10" y="191" text-anchor="end" class="bar-label">最低(−平社員)</text>
+        <rect x="0" y="180" width="350" height="14" class="bar-amber"/><text x="358" y="191" class="bar-value">0.79 落下幅−0.09</text>
+        <text x="-10" y="223" text-anchor="end" class="bar-label" font-weight="600">④ 因果 (MLP ablate)</text>
+        <text x="-10" y="241" text-anchor="end" class="bar-label">尊敬語</text>
+        <rect x="0" y="230" width="220" height="14" class="bar-red"/><text x="228" y="241" class="bar-value">7→4 (−43%)</text>
+        <text x="-10" y="261" text-anchor="end" class="bar-label">普通生成(対照)</text>
+        <rect x="0" y="250" width="400" height="14" class="bar-green"/><text x="408" y="261" class="bar-value">12→12 (100%維持)</text>
+      </g>
+    </svg>
+    <figcaption>4段全部生き残った。① 同一トークン「を」位置で 0.90、② 意味カテゴリ統制でも維持、③ LOO median 0.89・最低 0.79 で部分依存だが崩れない、④ L_mid 単層 ablate で<b>尊敬語特異的に -43%、普通生成は 100% 維持</b>＝部分的 load-bearing。</figcaption>
+  </figure>
+  <div class="finding"><b>結論(部分的肯定):</b> 日本語LLMは中間層に<b>尊敬語生成の部分的回路</b>を持つ。relativeに「読める≠使ってる」のギャップも観測 — probe精度が最高だった深層(L_late)を ablate しても出力は変わらず、中間層(L_mid)を抜くと尊敬語だけ崩れる。<b>謙譲語は ablate に react しない</b>＝語彙的に焼き込まれてる説。</div>
+</section>
+
+<section id="jp-summary">
+  <h2>🧭 番外⑦ 結局、何が見つかったのか</h2>
+  <p class="sub">9角度試して、初めて2本の柱が立った。形が違う2種類の finding。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 200" role="img" aria-label="敬語=線形/音符=位相 の2本柱">
+      <g transform="translate(170,10)">
+        <text x="-10" y="13" text-anchor="end" class="bar-label" font-weight="600">柱A: 敬語要請</text>
+        <text x="-10" y="31" text-anchor="end" class="bar-label">線形probe生存</text>
+        <rect x="0" y="20" width="400" height="14" class="bar-green"/><text x="408" y="31" class="bar-value">0.90 ✓</text>
+        <text x="-10" y="51" text-anchor="end" class="bar-label">因果(部分)</text>
+        <rect x="0" y="40" width="220" height="14" class="bar-amber"/><text x="228" y="51" class="bar-value">−43% 尊敬特異</text>
+        <text x="-10" y="83" text-anchor="end" class="bar-label" font-weight="600">柱B: 音符構造</text>
+        <text x="-10" y="101" text-anchor="end" class="bar-label">線形(stress後)</text>
+        <rect x="0" y="90" width="2" height="14" class="bar-red"/><text x="10" y="101" class="bar-value">z=−0.2 死亡</text>
+        <text x="-10" y="121" text-anchor="end" class="bar-label">位相(PH H_1)</text>
+        <rect x="0" y="110" width="370" height="14" class="bar-main"/><text x="378" y="121" class="bar-value">z=+3.7 復活</text>
+        <text x="-10" y="141" text-anchor="end" class="bar-label">PH LOO</text>
+        <rect x="0" y="130" width="310" height="14" class="bar-main"/><text x="318" y="141" class="bar-value">9/10 で z>2 維持</text>
+        <text x="0" y="180" class="axis-label">→ <b>日本語LLMの内部表現は、線形(敬語)と位相(音符)の2種類の言語学的構造を持つ。</b>線形偏重の評価では片方しか見えない。</text>
+      </g>
+    </svg>
+    <figcaption>2本の柱は別の手法で取れ、別の現象を捉えてる。敬語=社会的pragmatics→構文選択、音符=漢字部品の幾何関係。前者は線形probe+因果介入、後者は線形では消えて位相で復活。「LLM内部表現の多重評価フレーム」として論文化できる構造。</figcaption>
+  </figure>
+  <div class="finding"><b>到達点(2026-06-28):</b> 8角度 deflate した後の9角度目で、初めて rigor を生き残った2本柱。次は (1) 因果介入で謙譲語が落ちない理由(語彙 vs 構造)、(2) 規模3点目(13B 4bit)で位相がどう変わるか、(3) 文型バリエーション、(4) JSAI 2027 学生発表に向けた書き上げ。</div>
+  <div class="caveat"><b>残懐疑(楽観で読まない):</b> 全部 N≈10〜40 群・1〜2モデル・自作ラベルの探索段階。「干」抜きで H_1 z=1.9 ギリ割れ、「上司/平社員」が LOO 支柱、ablate -43% は N=12 の小標本。本物の論文には辞書検証・規模3点目・seed N増が要る。だが<b>線形偏重の評価が誤判定を生む</b>という指摘自体は手法的なので、サンプル小でも主張できる。</div>
 </section>
 
 </div><!-- /panel-jp -->
