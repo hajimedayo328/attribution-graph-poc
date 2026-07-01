@@ -787,6 +787,41 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   <div class="finding"><b>含意:</b> 「クラスタ＋環」という事前予想は半分間違い。実態は「個々は均等拡散、重心は環的配置」。これが「線形評価で死ぬ／位相で復活」の正体 — 線形は群間平均しか見ず凝縮を期待するため、重心の環的配置を捉えられない。<b>位相不変量の H_1 はこの種の「凝縮なき構造」専用の検出器</b>として働く。</div>
 </section>
 
+<section id="jp-onset">
+  <h2>🚀 番外⑫ 創発の瞬間を特定した — そして仮説が2つ死んだ (2026-07-01〜02)</h2>
+  <p class="sub">モデルを11個まで増やした。単変量仮説（密度・Gini）は新モデルの反例で死に、代わりにLLM-jp 6点+base/instruct比較で「創発の瞬間」が見えた。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 300" role="img" aria-label="LLM-jp 6点スケール曲線: 980mまでnull、1.8Bで+4.3に跳躍、以降減衰">
+      <g transform="translate(90,20)">
+        <text x="0" y="0" class="bar-label" font-weight="600">LLM-jp base系列 音符 H_1 z (6点スケール曲線)</text>
+        <line x1="0" y1="190" x2="700" y2="190" class="gridline"/>
+        <line x1="0" y1="110" x2="700" y2="110" stroke="var(--color-red)" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="705" y="114" class="axis-label" fill="var(--color-red)">z=2</text>
+        <!-- x: 150m,440m,980m,1.8B,3.7B,13B / y: z=-1..+5 → y=190-(z+1)*36 -->
+        <polyline points="40,186 160,168 280,183 400,0 520,82 640,104" fill="none" stroke="var(--color-blue)" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="40" cy="186" r="5" class="dot-no"/><text x="40" y="210" text-anchor="middle" class="bar-label">150m</text><text x="40" y="175" text-anchor="middle" class="bar-value">-0.9</text>
+        <circle cx="160" cy="168" r="5" class="dot-no"/><text x="160" y="210" text-anchor="middle" class="bar-label">440m</text><text x="160" y="157" text-anchor="middle" class="bar-value">-0.4</text>
+        <circle cx="280" cy="183" r="5" class="dot-no"/><text x="280" y="210" text-anchor="middle" class="bar-label">980m</text><text x="280" y="172" text-anchor="middle" class="bar-value">-0.8</text>
+        <circle cx="400" cy="0" r="6" class="dot-yes"/><text x="400" y="210" text-anchor="middle" class="bar-label" font-weight="700">1.8B</text><text x="418" y="8" class="bar-value" font-weight="700">+4.3 ← 創発</text>
+        <circle cx="520" cy="82" r="5" class="dot-yes"/><text x="520" y="210" text-anchor="middle" class="bar-label">3.7B</text><text x="538" y="86" class="bar-value">+2.0</text>
+        <circle cx="640" cy="104" r="5" class="dot-yes"/><text x="640" y="210" text-anchor="middle" class="bar-label">13B</text><text x="658" y="108" class="bar-value">+1.4</text>
+        <!-- instruct 2点 -->
+        <circle cx="400" cy="68" r="5" fill="var(--color-purple)"/><text x="352" y="60" class="bar-value" fill="var(--color-purple)">+2.4 (instruct)</text>
+        <circle cx="520" cy="32" r="5" fill="var(--color-purple)"/><text x="538" y="30" class="bar-value" fill="var(--color-purple)">+3.4 (instruct)</text>
+        <text x="0" y="245" class="axis-label">青=base系列、紫=instruct。980m→1.8Bの間でnull→+4.3のシャープな跳躍 = しきい値~1Bの急峻な創発。</text>
+        <text x="0" y="262" class="axis-label">instruction tuning は 1.8B では弱め(4.3→2.4)、3.7B では強める(2.0→3.4) = ピークを大規模側にシフト。</text>
+      </g>
+    </svg>
+    <figcaption>LLM-jp 6点 + instruct 2点。Qwen3系(0.6B null → 1.7B +4.2 → 4B +3.3)と合わせ<b>2系列で逆U字を再現</b>。両系列のピークが 1.7-1.8B 帯で同水準(+4.2/+4.3)なのも符合。各点1測定・LOOでz±1動くため base/instruct 差は境界的 — 主柱は<b>創発onsetのシャープさ</b>(-0.8→+4.3は誤差で説明不能)。</figcaption>
+  </figure>
+  <div class="fails">
+    <div class="fail"><span class="x">✗</span><p><b>密度→H_1 負相関、死亡。</b>N=5でrho=-0.82に見えたが、bootstrapでCIが0跨ぎ、Sarashina2 7B(疎なのにz=+0.8)が反例。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>Gini→H_1 逆U字、死亡。</b>Swallow 8BがQwen3 1.7Bとほぼ同じGini(0.29)でz=+0.2。単変量では説明できない。「Nを増やすと発見が消える」を実体験 — bootstrapを先にやるべきだった。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>GPT-Neo 1.3B、測定不可。</b>日本語漢字を単一トークン化できない = 音符現象は「日本語トークナイザを持つモデル」前提。</p></div>
+  </div>
+  <div class="finding"><b>生き残った主張:</b> 漢字音符の高次幾何構造は <b>~1Bのしきい値でシャープに創発</b>し、ピーク(1.7-1.8B帯)後は規模で減衰する — <b>2系列(LLM-jp/Qwen3)で再現された逆U字</b>。instruction tuning は曲線の形を変える(ピーク右シフト)。単変量のグラフ指標では説明できない = 創発は規模とアーキの複合。</div>
+</section>
+
 <section id="jp-summary">
   <h2>🧭 番外⑪ 結局、何が見つかったのか (Level 2.5 版)</h2>
   <p class="sub">同セッション続行で柱は 2 → 5 に増えた。形の違う5種類の finding が並ぶ。</p>
