@@ -812,7 +812,7 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
         <text x="0" y="262" class="axis-label">instruction tuning は 1.8B では弱め(4.3→2.4)、3.7B では強める(2.0→3.4) = ピークを大規模側にシフト。</text>
       </g>
     </svg>
-    <figcaption>LLM-jp 6点 + instruct 2点。Qwen3系(0.6B null → 1.7B +4.2 → 4B +3.3)と合わせ<b>2系列で逆U字を再現</b>。両系列のピークが 1.7-1.8B 帯で同水準(+4.2/+4.3)なのも符合。各点1測定・LOOでz±1動くため base/instruct 差は境界的 — 主柱は<b>創発onsetのシャープさ</b>(-0.8→+4.3は誤差で説明不能)。</figcaption>
+    <figcaption>LLM-jp 6点 + instruct 2点。Qwen3系(0.6B null → 1.7B +4.2 → 4B +3.3)と合わせ<b>2系列で逆U字を再現</b>。両系列のピークが 1.7-1.8B 帯で同水準なのも符合。<b>エラーバー確定済(LOO 10点)</b>: 980m LOO全点[-1.3, -0.0] vs 1.8B base LOO全点[+2.8, +4.0] = <b>完全非重複=創発onsetは誤差で説明不能</b>。1.8Bのtuning減衰(base median 3.3 vs instruct 2.0)も実質非重複で生存。一方「3.7Bでtuningが強める」はLOOレンジ重複で誤差内=主張しない。</figcaption>
   </figure>
   <div class="fails">
     <div class="fail"><span class="x">✗</span><p><b>密度→H_1 負相関、死亡。</b>N=5でrho=-0.82に見えたが、bootstrapでCIが0跨ぎ、Sarashina2 7B(疎なのにz=+0.8)が反例。</p></div>
