@@ -151,7 +151,7 @@
 
 <nav class="toc"><div class="toc-inner">
   <a href="#s1">1 問い</a><a href="#s2">2 現象</a><a href="#s3">3 規模創発</a><a href="#s4">4 訓練軸</a>
-  <a href="#s5">5 機構</a><a href="#s6">6 機能</a><a href="#s7">7 反証の記録</a><a href="#s8">8 教訓</a>
+  <a href="#s5">5 機構</a><a href="#s6">6 機能</a><a href="#s7">7 反証の記録</a><a href="#s8">8 合成言語</a><a href="#s9">9 教訓</a>
 </div></nav>
 
 <div class="container">
@@ -294,7 +294,7 @@
 <section id="s7">
   <div class="section-num">SECTION 7</div>
   <h2>反証の記録 — 予言を先に公開してから測った</h2>
-  <p class="lede">探索的研究の弱点は後づけの物語になること。6つの予測を測定前にgit公開し（コミットのタイムスタンプが証明）、それから測った。</p>
+  <p class="lede">探索的研究の弱点は後づけの物語になること。予測を測定前にgit公開し（コミットのタイムスタンプが証明）、それから測った。</p>
   <table>
     <tr><th>事前登録</th><th>予測</th><th>判定</th></tr>
     <tr><td>P3</td><td>意味の凝縮は150mから存在する</td><td class="hit">的中</td></tr>
@@ -303,12 +303,44 @@
     <tr><td>P2</td><td>第3系列（Sarashina2.2）でonset再現</td><td class="miss">外れ → レシピ依存の発見に転化</td></tr>
     <tr><td>P4</td><td>カタカナ字種は超早期に凝縮</td><td class="miss">外れ</td></tr>
     <tr><td>P6</td><td>44系列への拡張で再現</td><td class="miss">外れ → 古典10系列固有への転回</td></tr>
+    <tr><td>P7</td><td>合成言語：読み注釈ゼロで環消滅・注釈率に単調反応</td><td class="hit">両方的中</td></tr>
+    <tr><td>P8</td><td>合成言語：弱信号でのみ容量ゲートが出現</td><td class="hit">両方的中</td></tr>
   </table>
   <div class="callout warn">4つの外れが全部、主張を正確にした。登録がなければ「だいたい合ってた」と自己欺瞞できた — <b>それを防ぐのが事前登録</b>。探索的研究の実際の的中率はこのくらい。</div>
 </section>
 
 <section id="s8">
   <div class="section-num">SECTION 8</div>
+  <h2>合成言語 — 観察から実験へ：環を作れて、消せる</h2>
+  <p class="lede">ここまでは既製モデルの観察。最後に、意味グループ（共起を共有）と音符系列（読みトークンを共有・意味はバラバラ）だけを持つ人工のトイ言語（語彙339）を設計し、豆GPT（0.5M〜25Mパラメタ）をゼロから訓練した — 1本73秒。データを自由に操作できるので、環の原因を直接いじれる。</p>
+
+  <div class="card">
+    <h4>P7 — 読み共有が環の因果的源泉（用量反応）</h4>
+    <table style="margin:8px 0 4px;">
+      <tr><th>読み注釈率 p</th><th>0（読みなし）</th><th>0.05</th><th>0.1</th><th>0.3</th></tr>
+      <tr><td>音符 H₁ ratio</td><td><b>1.47（環なし）</b></td><td>9.34</td><td>10.59</td><td><b>15.85</b></td></tr>
+    </table>
+    <p style="margin:0; font-size:15px;">読み注釈を消すと<b>環だけが消える</b>（意味の凝縮は無傷で残る）。注釈を増やすほど環は単調に強くなる。相関ではなく<b>介入による因果</b>。</p>
+  </div>
+
+  <div class="card">
+    <h4>P8 — 容量ゲートの試験管内再現（容量 × 信号強度）</h4>
+    <table style="margin:8px 0 4px;">
+      <tr><th>モデル</th><th>強信号（p=0.3・クリーン）</th><th>弱信号（p=0.03・ノイズ50%）</th></tr>
+      <tr><td>0.5M</td><td>8.17 環あり</td><td><b>0.27 環なし</b></td></tr>
+      <tr><td>2M</td><td>13.14 環あり</td><td><b>1.08 環なし</b></td></tr>
+      <tr><td>8M</td><td>13.58 環あり</td><td><b>8.84 環あり</b></td></tr>
+      <tr><td>25M</td><td>6.89 環あり</td><td><b>10.41 環あり</b></td></tr>
+    </table>
+    <p style="margin:0; font-size:15px;">綺麗な信号なら最小0.5Mでも環が立つ。信号を薄く汚すと（注釈3%・半分デタラメ）、<b>同じデータなのに小モデルは環を掘れず、8Mから突然掘れる</b>。</p>
+  </div>
+
+  <div class="callout">実LLMで観察した「980M→1.8Bで環が突然現れる」しきい値の縮小再現。創発しきい値の正体は<b>「環を作る容量」ではなく「ノイズに埋もれた読み信号を発掘する容量」</b> — 実テキストで読みの共有はふりがな・かな文脈などの希薄な信号としてしか現れないため、大きなモデルだけがそれを掘り当てる。</div>
+  <div class="callout warn">留保：各セル1シード。合成言語は共起と読みだけの極端な単純化で、実LLMの環との対応は「同じ測定プロトコルで同じ挙動」という水準（機構の同一性までは含意しない）。</div>
+</section>
+
+<section id="s9">
+  <div class="section-num">SECTION 9</div>
   <h2>教訓と限界</h2>
   <div class="card"><h4>方法論の教訓（それ自体が貢献）</h4>
     <p style="font-size:15px; margin:0;">① 小nの相関はnで消える（このプロジェクトで5連続：密度・Gini・凝集・根・乖離の半分）。② Leave-One-Outの頑健性はセット拡張への耐性を保証しない。③ スワップテスト（構成の順位づけ）は相関より頑健な特別性検定。④ 測定形式が結論を変える（生成 vs 強制選択で3/12→10/12）。⑤ 生の量（ratio）の併記が「創発の蜃気楼」批判を防ぐ。</p></div>
