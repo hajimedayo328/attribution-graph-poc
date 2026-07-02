@@ -822,6 +822,53 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   <div class="finding"><b>生き残った主張:</b> 漢字音符の高次幾何構造は <b>~1Bのしきい値でシャープに創発</b>し、ピーク(1.7-1.8B帯)後は規模で減衰する — <b>2系列(LLM-jp/Qwen3)で再現された逆U字</b>。instruction tuning は曲線の形を変える(ピーク右シフト)。単変量のグラフ指標では説明できない = 創発は規模とアーキの複合。</div>
 </section>
 
+<section id="jp-prereg">
+  <h2>📜 番外⑬ 予言を先に公開してから測った — そして訓練軸 (2026-07-02)</h2>
+  <p class="sub">探索的発見の弱点は「後づけの物語」になること。そこで4つの予測を<a href="PREREGISTRATION.md">PREREGISTRATION.md</a>として測定前にgit公開し(コミットのタイムスタンプが証明)、それから測った。さらにPythiaの公開checkpointで「訓練のいつ生まれるか」も測った。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 210" role="img" aria-label="事前登録スコアボード: 的中1・僅差1・外れ2">
+      <g transform="translate(30,20)">
+        <text x="0" y="0" class="bar-label" font-weight="600">事前登録スコアボード (測定前に公開固定した4予測)</text>
+        <g transform="translate(0,20)">
+          <rect x="0" y="0" width="800" height="34" fill="var(--color-green-soft)" rx="4"/>
+          <text x="12" y="21" class="bar-label"><tspan font-weight="700">P3 的中</tspan> — 意味凝縮は150mから有意(z=-3.1)。「意味=早期・音符=後期」の2相時刻表が確証的に成立</text>
+        </g>
+        <g transform="translate(0,60)">
+          <rect x="0" y="0" width="800" height="34" fill="var(--color-amber-soft)" rx="4"/>
+          <text x="12" y="21" class="bar-label"><tspan font-weight="700">P1 僅差外れ</tspan> — Qwen3-8B z=+0.9 (予測≥1.0)。方向(減衰)は的中、Qwen3逆U字が4点で閉じた: 0.99→1.61→1.48→1.13</text>
+        </g>
+        <g transform="translate(0,100)">
+          <rect x="0" y="0" width="800" height="34" fill="var(--color-red-soft)" rx="4"/>
+          <text x="12" y="21" class="bar-label"><tspan font-weight="700">P2 外れ</tspan> — Sarashina2.2は別プロファイル(0.5b +1.7 / 1b +2.0 / 3b +0.2)。創発onsetは普遍でなく学習レシピ依存</text>
+        </g>
+        <g transform="translate(0,140)">
+          <rect x="0" y="0" width="800" height="34" fill="var(--color-red-soft)" rx="4"/>
+          <text x="12" y="21" class="bar-label"><tspan font-weight="700">P4 外れ</tspan> — カタカナ字種の凝縮は全規模で基準未達(-1.6〜-0.3)。多段の発達段階説は2相に縮んだ</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>4予測中クリーンな的中は1。<b>登録がなければP1/P2/P4も「だいたい合ってた」と自己欺瞞できた</b> — 事前登録が過剰一般化を出版前に殺した。これが探索的研究の実際の的中率。</figcaption>
+  </figure>
+  <figure class="chart">
+    <svg viewBox="0 0 860 230" role="img" aria-label="Pythia-2.8b訓練checkpoint掃引: 漸進的形成">
+      <g transform="translate(90,16)">
+        <text x="0" y="0" class="bar-label" font-weight="600">訓練のいつ生まれるか (Pythia-2.8b checkpoints, 英語rhyme H_1 の 観測/null 比率)</text>
+        <line x1="0" y1="160" x2="700" y2="160" class="gridline"/>
+        <!-- ratio 1.0..1.6 → y = 160 - (ratio-1.0)*260 -->
+        <polyline points="40,147 200,111 360,98 520,90 680,20" fill="none" stroke="var(--color-green)" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="40" cy="147" r="5" class="dot-no"/><text x="40" y="180" text-anchor="middle" class="bar-label">0.7%</text><text x="40" y="136" text-anchor="middle" class="bar-value">1.05</text>
+        <circle cx="200" cy="111" r="5" class="dot-no"/><text x="200" y="180" text-anchor="middle" class="bar-label">5.6%</text><text x="200" y="100" text-anchor="middle" class="bar-value">1.19</text>
+        <circle cx="360" cy="98" r="5" class="dot-yes"/><text x="360" y="180" text-anchor="middle" class="bar-label">22%</text><text x="360" y="87" text-anchor="middle" class="bar-value">1.24 初有意</text>
+        <circle cx="520" cy="90" r="5" class="dot-yes"/><text x="520" y="180" text-anchor="middle" class="bar-label">50%</text><text x="520" y="79" text-anchor="middle" class="bar-value">1.27</text>
+        <circle cx="680" cy="20" r="6" class="dot-yes"/><text x="680" y="180" text-anchor="middle" class="bar-label">100%</text><text x="680" y="9" text-anchor="middle" class="bar-value" font-weight="700">1.54</text>
+        <text x="0" y="210" class="axis-label">訓練進捗(%) — 漸進的な単調成長。規模軸のシャープな跳躍(980m:0.84→1.8B:1.63)と対照的。</text>
+      </g>
+    </svg>
+    <figcaption>訓練時間軸では位相はジャンプせず漸進的に育つ。規模軸ではしきい値未満のモデルは100%訓練しても構造が生まれない。<b>「容量がゲートし、訓練が育てる」2要因構造</b> — 規模創発が単なる訓練計算量の代理ではないことの分離。測定の裏でPythiaのcheckpointブランチに「mainと同一shaの偽重み」が混入している罠を検出・回避した(同一数値を疑い重みテンソルを直接比較して発覚)。</figcaption>
+  </figure>
+  <div class="finding"><b>最終形:</b> 漢字音符・英語rhymeの高次幾何構造は<b>モデル容量にゲートされてシャープに現れ(~1.7-2.8B、系列依存)、訓練の中では漸進的に育つ</b>。意味構造は最小規模から存在する。LLM内部表現の幾何は一枚岩でなく、<b>構造の種類・規模・訓練・レシピの4軸で異なる誕生をする</b>。16モデル・3言語・2軸・事前登録つき。</div>
+</section>
+
 <section id="jp-summary">
   <h2>🧭 番外⑪ 結局、何が見つかったのか (Level 2.5 版)</h2>
   <p class="sub">同セッション続行で柱は 2 → 5 に増えた。形の違う5種類の finding が並ぶ。</p>
