@@ -1008,6 +1008,35 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   </figure>
 </section>
 
+<section id="jp-geo">
+  <h2>📐 番外⑱ 数学を総当たりで環に当てる — 幾何・代数・解析・圏論 (2026-07-03)</h2>
+  <p class="sub">「他の数学分野は応用できないか」の実験。先行チェック(Engels et al. 2024: 曜日・月の機能的な円=引用必須の対比相手)を通してから、環に片っ端から数学を当てた。</p>
+  <div class="fails">
+    <div class="fail"><span class="x">✗</span><p><b>スペクトル簡易統計、2連続サニティ失敗。</b>固有値ペア縮退gapも(ψ₂,ψ₃)真円度も、合成円vsガウス塊を分離できず(等方性≠環の混同)。n=40+ノイズの円検出はad-hoc統計では無理 — 壊れた物差しで走ったモデル数値は破棄した。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>円座標(dreimac, 正規の道具)でも環の順序は言語的に不透明。</b>18base: 系列の角度集中 p=0.63(環上で系列は完全に交互)。q17はp=0.01だが角度分布が縮退気味で信用薄。MDS極角・辺分析に続き<b>3手法目の「並びに意味なし」</b>。</p></div>
+    <div class="fail"><span class="x">✗</span><p><b>Gromov-Wasserstein: 2系列の環は「形として」は似ていない</b> (GW z=-0.4)。系列間一致の正確な射程が確定 — <b>一致するのは統計(強さ・種・増幅)であって計量形状ではない</b>。「同じ強さ・同じ作られ方の環を、別々の形で作る」。</p></div>
+  </div>
+  <figure class="chart">
+    <svg viewBox="0 0 860 190" role="img" aria-label="遊びarc: 非晶質の環と熱緩和時間の指紋">
+      <g transform="translate(30,16)">
+        <text x="0" y="0" class="bar-label" font-weight="600">[代数] 環の角度間隔CV=1.14 (完全結晶=0, ランダム=0.97±0.14) → 非晶質の環 (回転対称なし・頂点推移性ゼロ)</text>
+        <text x="0" y="40" class="bar-label" font-weight="600">[解析] 熱緩和時間 τ=1/λ₂ — 予想(環=遅い)の真逆が出た:</text>
+        <g transform="translate(120,54)">
+          <text x="-10" y="12" text-anchor="end" class="bar-label">音符</text>
+          <rect x="0" y="2" width="52" height="14" class="bar-green"/><text x="60" y="14" class="bar-value">3.7 最速 (よく混ざる一体構造+薄い穴)</text>
+          <text x="-10" y="34" text-anchor="end" class="bar-label">ランダム</text>
+          <rect x="0" y="24" width="102" height="14" class="bar-base"/><text x="110" y="36" class="bar-value">7.3±2.1</text>
+          <text x="-10" y="56" text-anchor="end" class="bar-label">意味</text>
+          <rect x="0" y="46" width="394" height="14" class="bar-red"/><text x="402" y="58" class="bar-value">28.2 激遅 (熱が島に閉じ込められる)</text>
+        </g>
+        <text x="0" y="150" class="bar-label">「凝縮なき環」が混合時間という別の物理量でも見えた — PHと独立な補助指標に昇格できる質。</text>
+      </g>
+    </svg>
+    <figcaption>[圏論] は計算でなくスケッチ (<a href="CATEGORY_SKETCH.md">CATEGORY_SKETCH.md</a>): 「F_LLM-jpとF_Qwen3は<b>自然同型ではないが、位相不変量の商に落とすと同型</b>」=ホモロジーが同じで同相でない空間ペアのLLM版。P6=部分圏包含への非関手性、単方向乖離=内部構造圏→行動圏の関手の不在(記号接地回避の一断面)。指導教員との議論用に問い3つ付き。遊びラベル明示 — 言い換えであって定理ではない。</figcaption>
+  </figure>
+  <div class="finding"><b>幾何総当たりの収支:</b> 新しい陽性は熱の指紋のみ。だが「順序の不透明性」が4傍証に、「2系列一致」が正確な射程(統計であって形でない)に — <b>数学を増やすたびに主張は広がらず、正確になった</b>。学部数学の主要分野(位相・幾何・代数・解析・圏論)を一つの環に全部当てた記録。</div>
+</section>
+
 <section id="jp-summary">
   <h2>🧭 番外⑪ 結局、何が見つかったのか (Level 2.5 版)</h2>
   <p class="sub">同セッション続行で柱は 2 → 5 に増えた。形の違う5種類の finding が並ぶ。</p>
