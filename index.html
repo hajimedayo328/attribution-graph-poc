@@ -869,6 +869,42 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   <div class="finding"><b>最終形:</b> 漢字音符・英語rhymeの高次幾何構造は<b>モデル容量にゲートされてシャープに現れ(~1.7-2.8B、系列依存)、訓練の中では漸進的に育つ</b>。意味構造は最小規模から存在する。LLM内部表現の幾何は一枚岩でなく、<b>構造の種類・規模・訓練・レシピの4軸で異なる誕生をする</b>。16モデル・3言語・2軸・事前登録つき。</div>
 </section>
 
+<section id="jp-robust">
+  <h2>🛡 番外⑭ 想定される批判を先回りで全部潰す (2026-07-02 午後)</h2>
+  <p class="sub">査読で突かれる前に自分で突いた。プロトコル頑健性4点 + 系列を6つに増やした結果、主張は狭く・固くなった。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 260" role="img" aria-label="頑健性チェック4点の結果一覧">
+      <g transform="translate(30,18)">
+        <text x="0" y="0" class="bar-label" font-weight="600">プロトコル頑健性スイート (全通過)</text>
+        <g transform="translate(0,16)">
+          <rect x="0" y="0" width="800" height="30" fill="var(--color-green-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">層感度</tspan> — 980mは6深度(rel 0.25-0.90)全部null、1.8Bは全部有意(ratio 1.48-1.70) = onsetは層選択の人工物でない</text>
+        </g>
+        <g transform="translate(0,52)">
+          <rect x="0" y="0" width="800" height="30" fill="var(--color-green-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">共通item</tspan> — 両トークナイザ交差の同一38漢字で LLM-jp 1.62 / Qwen3 1.60 = ピーク一致が同一項目で再現</text>
+        </g>
+        <g transform="translate(0,88)">
+          <rect x="0" y="0" width="800" height="30" fill="var(--color-green-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">頻度統制</tspan> — 音符/意味のトークンID分布差なし(p=0.47)、頻度マッチnullでも z=+3.4 = 頻出漢字の偏りでは説明不能</text>
+        </g>
+        <g transform="translate(0,124)">
+          <rect x="0" y="0" width="800" height="30" fill="var(--color-amber-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">量子化</tspan> — 4bitはratioを1.60→1.46に減衰(~25%)するが破壊しない = 13B/8Bの減衰値は保守的推定、OLMoのnullは量子化で説明不能</text>
+        </g>
+        <g transform="translate(0,168)">
+          <text x="0" y="12" class="bar-label" font-weight="600">系列プロファイル分類 (6系列測定の帰結)</text>
+          <text x="0" y="34" class="bar-label">① <tspan font-weight="700">シャープ創発型</tspan>: LLM-jp / Qwen3 / Pythia — しきい値でratio~1.5-1.6のピーク、独立系列間で定量一致</text>
+          <text x="0" y="54" class="bar-label">② <tspan font-weight="700">早期弱形成→消失型</tspan>: Sarashina2.2 — 0.5-1bで弱い構造(1.3)、3bで消滅(1.05)</text>
+          <text x="0" y="74" class="bar-label">③ <tspan font-weight="700">不形成型</tspan>: OLMo-2 — 1Bも7Bもnull (英語rhyme)。Pythia 2.8bが+3.2なので「新しく強い=形成」ではない</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>先行研究との対比も確立: 一般点群のPH研究(arXiv:2606.19542)は「トポロジー再編は訓練最初期に集中」と報告するが、<b>言語カテゴリ条件付きの位相は訓練後半まで漸進成長する(番外⑬)</b> — 一般位相とカテゴリ位相は違う時間発展をする。</figcaption>
+  </figure>
+  <div class="finding"><b>最終主張(狭く・固く):</b> 言語カテゴリ条件付きトポロジー(音的類似のH_1)の<b>形成は学習レシピ依存</b>。形成する系列では<b>容量でシャープに現れ(独立2系列がratio~1.6@1.7-1.8Bで定量一致)、訓練内では漸進的に育つ</b>。意味カテゴリの凝縮は最小規模(150m)から常在。容量は必要条件であって十分条件ではない。</div>
+</section>
+
 <section id="jp-summary">
   <h2>🧭 番外⑪ 結局、何が見つかったのか (Level 2.5 版)</h2>
   <p class="sub">同セッション続行で柱は 2 → 5 に増えた。形の違う5種類の finding が並ぶ。</p>
