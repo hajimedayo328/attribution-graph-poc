@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>漢字音符のループ位相 — モデルが作る、機能なき幾何</title>
+<meta name="description" content="LLM内部表現のカテゴリ条件付きトポロジー研究。事前登録6本・16モデル・3言語。創発・機構・機能・射程の全記録。">
+<style>
+  :root {
+    --bg: #fbfbfd; --card: #ffffff; --ink: #1d1d1f; --sub: #6e6e73;
+    --line: #d2d2d7; --accent: #0066cc; --red: #c0392b; --blue: #2c5aa0;
+    --green: #1b7e3e; --gold: #c9a227;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "SF Pro Text", "Hiragino Sans", "Yu Gothic Medium",
+                 "Yu Gothic", "Meiryo", sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.75;
+    margin: 0; padding: 0; font-size: 16px; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 0 32px 60px; }
+  header.cover { text-align: center; padding: 96px 32px 56px; border-bottom: 1px solid var(--line);
+                 background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%); }
+  header.cover .badge { display: inline-block; padding: 4px 14px; border: 1px solid var(--line);
+    border-radius: 16px; font-size: 12px; color: var(--sub); margin-bottom: 22px; letter-spacing: 0.6px; }
+  header.cover h1 { font-size: 44px; font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; line-height: 1.2; }
+  header.cover h1 .accent { color: var(--accent); }
+  header.cover .subtitle { font-size: 19px; color: var(--sub); margin: 0 auto 8px; max-width: 640px; line-height: 1.5; }
+  header.cover .meta { font-size: 13px; color: var(--sub); margin-top: 26px; }
+  nav.toc { position: sticky; top: 0; background: rgba(251,251,253,0.92); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line); z-index: 100; padding: 10px 32px; font-size: 13px; }
+  nav.toc .toc-inner { max-width: 880px; margin: 0 auto; display: flex; gap: 18px; overflow-x: auto; }
+  nav.toc a { color: var(--sub); text-decoration: none; white-space: nowrap; transition: color 0.15s; }
+  nav.toc a:hover { color: var(--accent); }
+  section { padding: 56px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  .section-num { font-size: 13px; color: var(--accent); font-weight: 500; letter-spacing: 0.5px; margin-bottom: 6px; }
+  section h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
+  .lede { font-size: 16px; color: var(--sub); margin: 0 0 22px; max-width: 720px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+          padding: 20px 24px; margin: 18px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .card h4 { margin: 0 0 8px; font-size: 15px; }
+  .chart-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+                padding: 18px 18px 8px; margin: 22px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .chart-title { font-size: 14px; color: var(--sub); margin: 0 0 6px 6px; font-weight: 500; }
+  .chart-card svg { width: 100%; height: auto; display: block; }
+  .chart-note { font-size: 13px; color: var(--sub); margin: 8px 6px 10px; }
+  .step-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+               padding: 18px 22px; margin: 14px 0; }
+  .step-num { display: inline-block; width: 28px; height: 28px; background: var(--accent); color: #fff;
+              border-radius: 50%; text-align: center; line-height: 28px; font-weight: 600; margin-right: 10px; font-size: 14px; }
+  .compare-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 22px 0; }
+  @media (max-width: 640px) { .compare-cards { grid-template-columns: 1fr; } header.cover h1 { font-size: 32px; } }
+  .compare-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  .compare-card.green { border-top: 3px solid var(--green); }
+  .compare-card.red { border-top: 3px solid var(--red); }
+  .compare-card .big { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; }
+  .compare-card .big.g { color: var(--green); } .compare-card .big.r { color: var(--red); }
+  table { border-collapse: collapse; width: 100%; margin: 18px 0; font-size: 14px; background: var(--card);
+          border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+  th { background: #f5f5f7; font-weight: 600; font-size: 13px; color: var(--sub); }
+  tr:last-child td { border-bottom: none; }
+  .hit { color: var(--green); font-weight: 600; } .miss { color: var(--red); font-weight: 600; }
+  .near { color: var(--gold); font-weight: 600; }
+  .callout { border-left: 3px solid var(--accent); background: #f5f9ff; border-radius: 0 10px 10px 0;
+             padding: 14px 20px; margin: 20px 0; font-size: 15px; }
+  .callout.warn { border-left-color: var(--gold); background: #fdf9ee; }
+  code { background: #f0f0f3; padding: 2px 6px; border-radius: 3px; font-family: "SF Mono", Consolas, monospace; font-size: 13px; }
+  footer { text-align: center; padding: 56px 32px; color: var(--sub); font-size: 13px; }
+  footer a { color: var(--accent); text-decoration: none; }
+  a.plain { color: var(--accent); text-decoration: none; }
+  .axis { stroke: var(--line); stroke-width: 1; }
+  .axlabel { font-size: 11px; fill: var(--sub); font-family: inherit; }
+  .ptlabel { font-size: 11.5px; fill: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="cover">
+  <div class="badge">PREREGISTERED EXPLORATORY RESEARCH · 2026.06–07</div>
+  <h1>漢字音符のループ位相<br><span class="accent">— モデルが作る、機能なき幾何</span></h1>
+  <p class="subtitle">清・晴・精・静…「青」を音符に持つ漢字たちは、LLMの内部で輪を描く。それはデータに無く、能力にも使われない。ではどこから来て、何なのか。</p>
+  <p class="meta">16モデル · 3言語 · 事前登録6本(的中2) · 全数値再現可能 —
+    <a class="plain" href="index.html">全記録ログ(番外編)</a> ·
+    <a class="plain" href="RESULTS_SUMMARY.md">結果正本</a> ·
+    <a class="plain" href="PREREGISTRATION.md">事前登録</a></p>
+</header>
+
+<nav class="toc"><div class="toc-inner">
+  <a href="#s1">1 問い</a><a href="#s2">2 現象</a><a href="#s3">3 規模創発</a><a href="#s4">4 訓練軸</a>
+  <a href="#s5">5 機構</a><a href="#s6">6 機能</a><a href="#s7">7 反証の記録</a><a href="#s8">8 教訓</a>
+</div></nav>
+
+<div class="container">
+
+<section id="s1">
+  <div class="section-num">SECTION 1</div>
+  <h2>問い — 音でつながる言葉は、どんな形に並ぶか</h2>
+  <p class="lede">漢字の音符（青→清晴精静、読みを共有する部品）や英語の韻（cat/hat/bat）のような「音のグループ」を、LLMは内部でどう表現しているか。</p>
+  <div class="card">
+    <h4>測り方</h4>
+    <p style="margin:0; font-size:15px;">漢字1文字ずつをモデルに入れ、中間層のベクトル（数千次元の点）を取り出す。点群の形を Persistent Homology で測る — <b>H₀</b>=散らばり、<b>H₁</b>=輪っか（ループ）。同じ数の漢字をランダムに選んだ偽グループ120〜200回と比べ、<b>ratio</b>（観測/ランダム平均）と <b>z</b>（何σ外れているか）で「偶然でない形」を判定する。</p>
+  </div>
+  <div class="callout">意味のグループ（犬・猫・馬…）は<b>ぎゅっと凝縮</b>する（直感通り）。音符のグループは逆に<b>散らばりながら輪を描く</b> — この輪が本研究の主役。</div>
+</section>
+
+<section id="s2">
+  <div class="section-num">SECTION 2</div>
+  <h2>現象 — 古典10系列だけが持つ、稀な輪</h2>
+  <p class="lede">当初「音符カテゴリ一般の性質」に見えたが、系列を44まで拡張すると消えた。診断の結果、輪を持つのは古典10系列（青寺工反主同干方古生）だけと確定。</p>
+  <table>
+    <tr><th>検証</th><th>LLM-jp 1.8B</th><th>Qwen3 1.7B</th></tr>
+    <tr><td>古典10系列（フィラー150漢字の清潔null）</td><td><b>ratio 1.45 / z +2.7</b></td><td><b>ratio 1.34 / z +2.6</b></td></tr>
+    <tr><td>追加系列のみ（可・官・交・各…）</td><td>1.07 / null</td><td>0.97 / null</td></tr>
+    <tr><td>スワップテスト：ランダム10系列の組×200の中での順位</td><td><b>99.5パーセンタイル</b></td><td><b>97.0パーセンタイル</b></td></tr>
+  </table>
+  <div class="callout warn">何がこの10系列を分けるのかは<b>未解明</b>。系列サイズ・漢字頻度・埋め込み凝集・音符の根の頻度 — 4因子すべて検定して棄却済み。識別因子は open question。</div>
+</section>
+
+<section id="s3">
+  <div class="section-num">SECTION 3</div>
+  <h2>規模創発 — しきい値 ~1B で突然生まれ、その後薄れる</h2>
+  <p class="lede">LLM-jp 6サイズ + Qwen3 4サイズで同じ測定。980m まで完全にゼロ、1.8B で突然出現。独立2系列のピークが同じ位置・同じ高さで揃った。</p>
+  <div class="chart-card">
+    <div class="chart-title">音符 H₁ の 観測/ランダム比 (ratio) × モデル規模（対数軸） — 青=LLM-jp base系列、金=Qwen3系列</div>
+    <svg viewBox="0 0 760 290">
+      <line x1="70" y1="250" x2="690" y2="250" class="axis"/>
+      <line x1="70" y1="30" x2="70" y2="250" class="axis"/>
+      <line x1="70" y1="201" x2="690" y2="201" stroke="#d2d2d7" stroke-dasharray="4 4"/>
+      <text x="694" y="205" class="axlabel">ratio=1.0 (ランダム)</text>
+      <polyline points="92,240 230,218 333,240 411,47 503,125 665,145" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="92" cy="240" r="4.5" fill="var(--blue)"/><text x="92" y="266" text-anchor="middle" class="axlabel">150m</text>
+      <circle cx="230" cy="218" r="4.5" fill="var(--blue)"/><text x="230" y="266" text-anchor="middle" class="axlabel">440m</text>
+      <circle cx="333" cy="240" r="4.5" fill="var(--blue)"/><text x="333" y="266" text-anchor="middle" class="axlabel">980m</text>
+      <circle cx="411" cy="47" r="5.5" fill="var(--blue)"/><text x="411" y="36" text-anchor="middle" class="ptlabel" fill="var(--blue)">1.8B: 1.63</text>
+      <circle cx="503" cy="125" r="4.5" fill="var(--blue)"/><text x="503" y="114" text-anchor="middle" class="axlabel">3.7B</text>
+      <circle cx="665" cy="145" r="4.5" fill="var(--blue)"/><text x="665" y="266" text-anchor="middle" class="axlabel">13B</text>
+      <polyline points="270,204 404,52 513,84 602,169" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="270" cy="204" r="4.5" fill="var(--gold)"/><text x="270" y="192" text-anchor="middle" class="axlabel">0.6B</text>
+      <circle cx="404" cy="52" r="5.5" fill="var(--gold)"/><text x="404" y="74" text-anchor="middle" class="ptlabel" fill="#a08420">1.7B: 1.61</text>
+      <circle cx="513" cy="84" r="4.5" fill="var(--gold)"/><text x="513" y="73" text-anchor="middle" class="axlabel">4B</text>
+      <circle cx="602" cy="169" r="4.5" fill="var(--gold)"/><text x="602" y="192" text-anchor="middle" class="axlabel">8B(4bit)</text>
+    </svg>
+    <p class="chart-note">生の観測量そのものが跳ねる（zの統計人工物ではない）。onsetのエラーバー：980mはLOO全10点が[-1.3, -0.0]、1.8BはLOO全10点が[+2.8, +4.0] — <b>2.8σの完全非重複</b>。系列プロファイルは3型：シャープ創発型（LLM-jp/Qwen3/Pythia）・早期弱形成消失型（Sarashina2.2）・不形成型（OLMo-2、7Bまでnull）— 形成自体が学習レシピ依存。</p>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="section-num">SECTION 4</div>
+  <h2>訓練軸 — 規模では跳び、訓練では育つ</h2>
+  <p class="lede">Pythia-2.8b の公開checkpointで「訓練のいつ生まれるか」を測定（英語rhyme）。規模軸のシャープさと対照的に、訓練の中では漸進的に育つ。</p>
+  <div class="chart-card">
+    <div class="chart-title">rhyme H₁ ratio × 訓練進捗 (Pythia-2.8b checkpoints)</div>
+    <svg viewBox="0 0 760 290">
+      <line x1="70" y1="250" x2="690" y2="250" class="axis"/>
+      <line x1="70" y1="30" x2="70" y2="250" class="axis"/>
+      <line x1="70" y1="201" x2="690" y2="201" stroke="#d2d2d7" stroke-dasharray="4 4"/>
+      <text x="694" y="205" class="axlabel">ratio=1.0</text>
+      <polyline points="74,189 105,155 206,142 380,135 690,69" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="74" cy="189" r="4.5" fill="var(--green)"/><text x="74" y="266" text-anchor="middle" class="axlabel">0.7%</text>
+      <circle cx="105" cy="155" r="4.5" fill="var(--green)"/><text x="115" y="266" text-anchor="middle" class="axlabel">5.6%</text>
+      <circle cx="206" cy="142" r="4.5" fill="var(--green)"/><text x="206" y="266" text-anchor="middle" class="axlabel">22%</text>
+      <circle cx="380" cy="135" r="4.5" fill="var(--green)"/><text x="380" y="266" text-anchor="middle" class="axlabel">50%</text>
+      <circle cx="690" cy="69" r="5.5" fill="var(--green)"/><text x="676" y="58" text-anchor="middle" class="ptlabel" fill="var(--green)">100%: 1.54</text>
+    </svg>
+    <p class="chart-note"><b>容量が門番、訓練が育ての親</b> — しきい値未満のモデルは100%訓練しても構造が生まれず、容量があれば訓練とともに漸進成長する。一般点群のPH研究（arXiv:2606.19542「再編は訓練最初期に集中」）と逆で、カテゴリ条件付きの位相は後半まで育ち続ける。</p>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="section-num">SECTION 5</div>
+  <h2>機構 — 種を埋め込みが植え、第2層が増幅する</h2>
+  <p class="lede">この輪はどこから来るのか。3段で絞り込んだ。</p>
+  <div class="step-card"><span class="step-num">1</span><b>データ由来ではない（事前登録P5・的中）</b><br>
+    日本語Wikipedia 1億文字の共起統計（PPMI）を同じパイプラインで測ると、意味の凝縮は出る（z=-3.0）が音符の輪は出ない（ratio 0.72）。<b>輪はモデルが自分で作る</b>。</div>
+  <div class="step-card"><span class="step-num">2</span><b>種（L0）と増幅（層計算）の2部品</b><br>
+    埋め込み直後に弱い「種」（ratio ~1.2）、中層で1.6へ。3.7Bでは種が育つのに増幅が死ぬ（1.32→1.31）— <b>減衰の正体は増幅の消失</b>。ピークの（種, 増幅）は2系列で（1.22, +0.41）≒（1.25, +0.35）と定量一致。</div>
+  <div class="step-card"><span class="step-num">3</span><b>増幅器は第2層に局在、attention+MLPの協働</b><br>
+    全層プロファイルでL2にジャンプ（+0.45/+0.37）、以後25層近く「凍結」されたまま運ばれ、最終層で捨てられる。L2のattentionとMLPを個別に消すと各~半分ずつ減る — 協働回路。Qwen3 0.6Bは種を持ちながらL3以降が分散的に消す。</div>
+</section>
+
+<section id="s6">
+  <div class="section-num">SECTION 6</div>
+  <h2>機能 — その輪は、能力に使われていない</h2>
+  <p class="lede">輪を持つモデルは漢字を読め、持たないモデルは読めないのか？ logprob強制選択（正しい読み/韻 vs もっともらしい誤答、N=48問）で12モデルを試験した。</p>
+  <div class="compare-cards">
+    <div class="compare-card green">
+      <h4>位相ゼロのモデル</h4>
+      <div class="big g">90–100%</div>
+      <p style="font-size:14px; color:var(--sub); margin:8px 0 0;">LLM-jp 150m: 43/48 · OLMo-2 7B: 48/48（満点）。<b>輪が無くても完璧に読める・韻を判定できる</b>。</p>
+    </div>
+    <div class="compare-card red">
+      <h4>位相最強のモデル</h4>
+      <div class="big r">83%</div>
+      <p style="font-size:14px; color:var(--sub); margin:8px 0 0;">Qwen3-1.7B（z=+4.2）: 40/48。読み能力を決めるのは日本語データ量であって、輪ではない。</p>
+    </div>
+  </div>
+  <div class="callout"><b>結論：位相は行動能力の必要条件ではない</b>（単方向乖離）。N=12で見えた「位相があるのに能力なし」はNを4倍にすると消えた — 小標本の人工物。創発する・頑健・2系列一致、それでも<b>副産物（epiphenomenal）</b>。「表現の記述は機能を含意しない」— probe研究への警告の位相版。</div>
+</section>
+
+<section id="s7">
+  <div class="section-num">SECTION 7</div>
+  <h2>反証の記録 — 予言を先に公開してから測った</h2>
+  <p class="lede">探索的研究の弱点は後づけの物語になること。6つの予測を測定前にgit公開し（コミットのタイムスタンプが証明）、それから測った。</p>
+  <table>
+    <tr><th>事前登録</th><th>予測</th><th>判定</th></tr>
+    <tr><td>P3</td><td>意味の凝縮は150mから存在する</td><td class="hit">的中</td></tr>
+    <tr><td>P5</td><td>音符の輪はコーパス統計に無い</td><td class="hit">的中</td></tr>
+    <tr><td>P1</td><td>Qwen3-8Bで減衰が続く</td><td class="near">僅差外れ（方向は的中）</td></tr>
+    <tr><td>P2</td><td>第3系列（Sarashina2.2）でonset再現</td><td class="miss">外れ → レシピ依存の発見に転化</td></tr>
+    <tr><td>P4</td><td>カタカナ字種は超早期に凝縮</td><td class="miss">外れ</td></tr>
+    <tr><td>P6</td><td>44系列への拡張で再現</td><td class="miss">外れ → 古典10系列固有への転回</td></tr>
+  </table>
+  <div class="callout warn">4つの外れが全部、主張を正確にした。登録がなければ「だいたい合ってた」と自己欺瞞できた — <b>それを防ぐのが事前登録</b>。探索的研究の実際の的中率はこのくらい。</div>
+</section>
+
+<section id="s8">
+  <div class="section-num">SECTION 8</div>
+  <h2>教訓と限界</h2>
+  <div class="card"><h4>方法論の教訓（それ自体が貢献）</h4>
+    <p style="font-size:15px; margin:0;">① 小nの相関はnで消える（このプロジェクトで5連続：密度・Gini・凝集・根・乖離の半分）。② Leave-One-Outの頑健性はセット拡張への耐性を保証しない。③ スワップテスト（構成の順位づけ）は相関より頑健な特別性検定。④ 測定形式が結論を変える（生成 vs 強制選択で3/12→10/12）。⑤ 生の量（ratio）の併記が「創発の蜃気楼」批判を防ぐ。</p></div>
+  <div class="card"><h4>限界</h4>
+    <p style="font-size:15px; margin:0;">古典10系列の識別因子は未解明。各点は基本1シード（LOOでz±1）。13B/8Bは4bit測定（~25%減衰、保守的推定）。音符ラベルは標準系列準拠だが全数の字典照合は未了。位相の因果介入（輪を壊すと何が変わるか）は部分的。</p></div>
+  <p style="font-size:14px; color:var(--sub);">全数値の正本は <a class="plain" href="RESULTS_SUMMARY.md">RESULTS_SUMMARY.md</a>、探索から反証までの全過程（撤回履歴込み）は<a class="plain" href="index.html">研究ログ（番外編⑤〜⑰）</a>、予測と照合は <a class="plain" href="PREREGISTRATION.md">PREREGISTRATION.md</a>。</p>
+</section>
+
+</div>
+
+<footer>
+  漢字音符のループ位相 — 2026.06.27–07.03 · RTX 5070 Ti 1台 · 総コスト¥0<br>
+  <a href="https://github.com/hajimedayo328/attribution-graph-poc">github.com/hajimedayo328/attribution-graph-poc</a>
+</footer>
+
+</body>
+</html>
