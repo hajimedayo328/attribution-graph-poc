@@ -905,6 +905,40 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   <div class="finding"><b>最終主張(狭く・固く):</b> 言語カテゴリ条件付きトポロジー(音的類似のH_1)の<b>形成は学習レシピ依存</b>。形成する系列では<b>容量でシャープに現れ(独立2系列がratio~1.6@1.7-1.8Bで定量一致)、訓練内では漸進的に育つ</b>。意味カテゴリの凝縮は最小規模(150m)から常在。容量は必要条件であって十分条件ではない。</div>
 </section>
 
+<section id="jp-dissoc">
+  <h2>⚡ 番外⑮ 最後の問い:「その位相、能力に効いてるの？」→ 効いてなかった (2026-07-02 夕)</h2>
+  <p class="sub">創発する位相の機能的意義を検証。12モデルで「位相の有無」×「行動能力(logprob強制選択: 正しい読み/韻 vs もっともらしい誤答)」の対応を測った。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 330" role="img" aria-label="位相×行動の二重乖離表">
+      <g transform="translate(30,18)">
+        <text x="0" y="0" class="bar-label" font-weight="600">位相 × 行動能力 (JP=漢字読み12問 / EN=韻判定12問, chance=6/12)</text>
+        <g transform="translate(0,16)">
+          <rect x="0" y="0" width="800" height="30" fill="var(--color-amber-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">能力あり・位相なし</tspan> — LLM-jp 150m/440m/980m: 読み11-12/12満点 (位相z≈-0.8) / OLMo-2 1B・7B: 韻11-12/12 (位相null)</text>
+        </g>
+        <g transform="translate(0,52)">
+          <rect x="0" y="0" width="800" height="30" fill="var(--color-amber-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">位相あり・能力なし/弱</tspan> — pythia-2.8b: 位相z=+3.2なのに韻7/12=チャンス / Qwen3-1.7B: 位相最強(+4.2)なのに読み8/12</text>
+        </g>
+        <g transform="translate(0,88)">
+          <rect x="0" y="0" width="800" height="30" fill="var(--color-subtle)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">一致セル</tspan> — LLM-jp 1.8B/3.7B (両あり) / pythia-1.4b (両なし) / Qwen3-4B EN (両あり)</text>
+        </g>
+        <text x="0" y="146" class="bar-label" font-weight="600">読み能力を実際に決めるもの: 日本語データ量 (LLM-jpは150mでも満点、Qwen3は4Bでも10/12)</text>
+        <text x="0" y="168" class="bar-label">位相を実際に決めるもの: 学習レシピ (規模しきい値つき)。両者は別の要因に従う = 無相関</text>
+        <g transform="translate(0,190)">
+          <rect x="0" y="0" width="800" height="60" fill="var(--color-red-soft)" rx="4"/>
+          <text x="12" y="24" class="bar-label" font-weight="700">結論: カテゴリ条件付きH_1位相は、対応する行動能力の必要条件でも十分条件でもない。</text>
+          <text x="12" y="46" class="bar-label">創発はする(シャープ・頑健・2系列定量一致)。だが機能的基盤ではなく「学習レシピの幾何的シグネチャ」= 副産物。</text>
+        </g>
+        <text x="0" y="278" class="axis-label">これは番外⑥の敬語で見た「probeで読める≠生成に使われる」ギャップの位相版。「表現の記述は機能を含意しない」が</text>
+        <text x="0" y="295" class="axis-label">この研究を貫く統一テーマになった。位相の意義を証明しようとして「意義がない」ことを証明した — 正直な科学の形。</text>
+      </g>
+    </svg>
+    <figcaption>副産物: Qwen3-4Bの初期読みテスト3/12 (番外①) は生成形式の失敗と確定 — 強制選択なら10/12で知識はある。測定形式が結論を変える、もこの研究で繰り返し出たテーマ。TDA×LLM分野への実証的警告として「位相の記述だけの論文は機能面の検証を欠く」を二重乖離×2言語で示した。</figcaption>
+  </figure>
+</section>
+
 <section id="jp-summary">
   <h2>🧭 番外⑪ 結局、何が見つかったのか (Level 2.5 版)</h2>
   <p class="sub">同セッション続行で柱は 2 → 5 に増えた。形の違う5種類の finding が並ぶ。</p>
