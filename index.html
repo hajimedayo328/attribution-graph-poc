@@ -939,6 +939,72 @@ footer.site .note { margin-top: var(--space-lg); font-size: var(--text-sm); colo
   </figure>
 </section>
 
+<section id="jp-mech">
+  <h2>🔧 番外⑯ ループはどこで作られるか — 種と増幅器 (2026-07-02深夜)</h2>
+  <p class="sub">機構を3段で掘った: ①データ由来か? (コーパス統計のPPMIで測る) ②どの層が作るか? (全層プロファイル) ③層の中の何が? (attn/MLP個別ablation)</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 300" role="img" aria-label="機構分解: P5コーパス不在、L2増幅器、種と増幅の分離">
+      <g transform="translate(30,18)">
+        <text x="0" y="0" class="bar-label" font-weight="600">① P5(事前登録・的中): ja Wikipedia 1億文字のPPMI点群には…</text>
+        <text x="20" y="22" class="bar-label">意味の凝縮 <tspan font-weight="700">あり</tspan> (H_0 z=-3.0) / 音符のループ <tspan font-weight="700">なし</tspan> (ratio=0.72) → <tspan font-weight="700">ループはデータの表面統計に無い=モデルが作る</tspan></text>
+        <text x="0" y="58" class="bar-label" font-weight="600">② 全層プロファイル: 増幅はL2に局在、その後25層「凍結」、最終層で崩壊</text>
+        <text x="20" y="80" class="bar-label">LLM-jp 1.8B: L0種1.23 → <tspan font-weight="700">L2で+0.45ジャンプ</tspan> → L9-L22ずっと1.66-1.73 (Δ≈0.00) → 最終2層で崩壊</text>
+        <text x="20" y="100" class="bar-label">Qwen3 1.7B: L0種1.23 → <tspan font-weight="700">L2で+0.37ジャンプ</tspan> → L3-L27まで1.57で完全凍結 → L28崩壊</text>
+        <text x="20" y="120" class="bar-label">Qwen3 0.6B: L2で1.39まで上がる(芽はある!)のに → L3以降が消去(0.97)。L3丸ごとスキップでも復活せず=<tspan font-weight="700">分散消去</tspan></text>
+        <text x="0" y="156" class="bar-label" font-weight="600">③ L2の中身: attention と MLP の協働 (どちらか片方ではない)</text>
+        <text x="20" y="178" class="bar-label">L2をablate: -attnでΔ-0.15/-0.18、-mlpでΔ-0.18/-0.20 (LLM-jp/Qwen3) = <tspan font-weight="700">各~半分ずつ、寄与構造まで2系列一致</tspan></text>
+        <g transform="translate(0,200)">
+          <rect x="0" y="0" width="800" height="60" fill="var(--color-blue-soft)" rx="4"/>
+          <text x="12" y="24" class="bar-label" font-weight="700">機構の結論: 創発 = 種(埋め込み学習が植える・データ統計外) × 増幅(L2のattn+MLP協働)の符号転換。</text>
+          <text x="12" y="46" class="bar-label">ピークの(種,増幅)は2系列で(1.22,+0.41)≒(1.25,+0.35)と定量一致。小モデルのnullは「種なし型」と「分散消去型」の2機構。</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>①は事前登録P5の的中 (意味幾何=データ継承だから150mから存在、音符ループ=モデルの構築物だから容量閾値・レシピ依存)。②③は探索的。一度作られた位相が残差ストリームを25層近く無変化で運ばれる「凍結」は印象的な観察。</figcaption>
+  </figure>
+</section>
+
+<section id="jp-scope">
+  <h2>🎯 番外⑰ 一般化が壊れ、本当の射程が確定した (2026-07-02〜03)</h2>
+  <p class="sub">「音符カテゴリ全体の性質」か検証するため、事前登録P6で系列を10→44に4倍拡張して再測定。結果は外れ — そして診断が本当の姿を特定した。</p>
+  <figure class="chart">
+    <svg viewBox="0 0 860 330" role="img" aria-label="P6転回: 拡張で消失、診断で古典10固有と確定、スワップテストで稀少性確認">
+      <g transform="translate(30,18)">
+        <g transform="translate(0,0)">
+          <rect x="0" y="0" width="800" height="30" fill="var(--color-red-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">P6外れ</tspan> — 拡張44系列でonset消失 (1.8B z=+3.9→0.0)。「音符一般」の主張は死亡</text>
+        </g>
+        <g transform="translate(0,38)">
+          <rect x="0" y="0" width="800" height="46" fill="var(--color-green-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">診断①</tspan> — フィラー150漢字で作った清潔なnullに対し、古典10系列だけなら再現: LLM-jp 1.45/z=+2.7、Qwen3 1.34/z=+2.6</text>
+          <text x="12" y="38" class="bar-label">追加系列のみは両系列でnull (1.07/0.97) = <tspan font-weight="700">ループは古典10系列(青寺工反主同干方古生)に固有</tspan></text>
+        </g>
+        <g transform="translate(0,92)">
+          <rect x="0" y="0" width="800" height="46" fill="var(--color-green-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">診断②スワップテスト</tspan> — ランダムな10系列の組×200と比較: 古典10は <tspan font-weight="700">99.5パーセンタイル(LLM-jp) / 97.0(Qwen3)</tspan></text>
+          <text x="12" y="38" class="bar-label">= 「最初の系列選択の偶然」説は棄却。上位3%未満の稀な構成で、部分的に混ぜても立たない=組み合わせ全体の性質</text>
+        </g>
+        <g transform="translate(0,146)">
+          <rect x="0" y="0" width="800" height="46" fill="var(--color-amber-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">未解明</tspan> — 何が10系列を分けるか: 系列サイズ✗ 頻度✗ 埋め込み凝集✗ 音符の根の頻度✗ (4因子とも棄却)</text>
+          <text x="12" y="38" class="bar-label">44系列版で示唆(-0.56)だった凝集も70系列版で消滅(-0.02)。識別因子は open question として残る</text>
+        </g>
+        <g transform="translate(0,200)">
+          <rect x="0" y="0" width="800" height="46" fill="var(--color-amber-soft)" rx="4"/>
+          <text x="12" y="19" class="bar-label"><tspan font-weight="700">行動テストN=12→48でもう1つ修正</tspan> — 「位相あって能力なし」セルは小標本の人工物と判明 (Qwen3 67→83%, pythia 58→71%)</text>
+          <text x="12" y="38" class="bar-label">生き残り: <tspan font-weight="700">位相は能力に必要ない</tspan> (位相ゼロのLLM-jp 150m=43/48, OLMo-2 7B=48/48満点)。二重乖離→単方向乖離に格下げ</text>
+        </g>
+        <g transform="translate(0,258)">
+          <rect x="0" y="0" width="800" height="52" fill="var(--color-blue-soft)" rx="4"/>
+          <text x="12" y="22" class="bar-label" font-weight="700">最終形: 古典10音符系列という稀な配置だけが、データに無いループ位相をL2で構築し、それは行動能力に使われない。</text>
+          <text x="12" y="42" class="bar-label">教訓5連: 小n相関はnで消える(密度/Gini/凝集/根/乖離半分)。LOOはセット拡張耐性を保証しない。全記録は PREREGISTRATION.md と RESULTS_SUMMARY.md。</text>
+        </g>
+      </g>
+    </svg>
+    <figcaption>探索→予言→反証→診断→再定義のフルサイクル2周目。主張は狭くなったが、狭い主張は清潔なnull・スワップテスト・N=48行動テストの全部に耐える。「広く浅い主張」より「狭く固い主張」— これがこの研究ログ全体の到達点。</figcaption>
+  </figure>
+</section>
+
 <section id="jp-summary">
   <h2>🧭 番外⑪ 結局、何が見つかったのか (Level 2.5 版)</h2>
   <p class="sub">同セッション続行で柱は 2 → 5 に増えた。形の違う5種類の finding が並ぶ。</p>
