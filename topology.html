@@ -84,7 +84,69 @@
   <p class="meta">16モデル · 3言語 · 事前登録6本(的中2) · 全数値再現可能 —
     <a class="plain" href="index.html">全記録ログ(番外編)</a> ·
     <a class="plain" href="RESULTS_SUMMARY.md">結果正本</a> ·
-    <a class="plain" href="PREREGISTRATION.md">事前登録</a></p>
+    <a class="plain" href="PREREGISTRATION.md">事前登録</a> ·
+    <a class="plain" href="CATEGORY_SKETCH.md">圏論スケッチ</a></p>
+
+  <div style="max-width:1020px; margin:40px auto 0; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px 16px 10px; box-shadow:0 1px 3px rgba(0,0,0,0.04); text-align:left;">
+    <div style="font-size:14px; color:var(--sub); font-weight:500; margin:0 0 4px 8px;">研究の全体像 — 4コマで</div>
+    <svg viewBox="0 0 980 240" style="width:100%; height:auto; display:block;">
+      <!-- ①環 -->
+      <g transform="translate(10,18)">
+        <text x="105" y="8" text-anchor="middle" style="font-size:12px; fill:var(--accent); font-weight:600;">① 発見</text>
+        <circle cx="105" cy="92" r="52" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3 4"/>
+        <g style="font-size:15px;">
+          <text x="105" y="34" text-anchor="middle">清</text>
+          <text x="156" y="70" text-anchor="middle">晴</text>
+          <text x="156" y="126" text-anchor="middle">精</text>
+          <text x="105" y="160" text-anchor="middle">静</text>
+          <text x="54" y="126" text-anchor="middle">情</text>
+          <text x="54" y="70" text-anchor="middle">請</text>
+        </g>
+        <text x="105" y="97" text-anchor="middle" style="font-size:11px; fill:var(--sub);">H₁ ループ</text>
+        <text x="105" y="192" text-anchor="middle" style="font-size:12px; fill:var(--ink); font-weight:600;">音符の漢字が環を描く</text>
+        <text x="105" y="210" text-anchor="middle" style="font-size:11px; fill:var(--sub);">古典10系列のみ · 上位3%の稀な配置</text>
+      </g>
+      <text x="238" y="115" style="font-size:20px; fill:var(--line);">→</text>
+      <!-- ②創発 -->
+      <g transform="translate(260,18)">
+        <text x="105" y="8" text-anchor="middle" style="font-size:12px; fill:var(--accent); font-weight:600;">② 規模で創発</text>
+        <line x1="20" y1="150" x2="195" y2="150" stroke="var(--line)"/>
+        <polyline points="25,145 65,142 105,145 140,50 165,95 190,105" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="140" cy="50" r="5" fill="var(--blue)"/>
+        <text x="140" y="38" text-anchor="middle" style="font-size:11px; fill:var(--blue); font-weight:700;">1.8B</text>
+        <text x="70" y="130" text-anchor="middle" style="font-size:10.5px; fill:var(--sub);">980mまでゼロ</text>
+        <text x="105" y="192" text-anchor="middle" style="font-size:12px; fill:var(--ink); font-weight:600;">しきい値で突然生まれる</text>
+        <text x="105" y="210" text-anchor="middle" style="font-size:11px; fill:var(--sub);">2系列一致 · 訓練内では漸進成長</text>
+      </g>
+      <text x="488" y="115" style="font-size:20px; fill:var(--line);">→</text>
+      <!-- ③機構 -->
+      <g transform="translate(510,18)">
+        <text x="105" y="8" text-anchor="middle" style="font-size:12px; fill:var(--accent); font-weight:600;">③ 機構</text>
+        <circle cx="35" cy="90" r="10" fill="none" stroke="var(--sub)" stroke-width="1.5"/>
+        <text x="35" y="118" text-anchor="middle" style="font-size:10.5px; fill:var(--sub);">種 1.2</text>
+        <text x="35" y="132" text-anchor="middle" style="font-size:10px; fill:var(--sub);">(埋め込み)</text>
+        <line x1="50" y1="90" x2="78" y2="90" stroke="var(--line)" stroke-width="1.5"/>
+        <rect x="80" y="70" width="56" height="40" rx="8" fill="#f0f4ff" stroke="var(--accent)"/>
+        <text x="108" y="88" text-anchor="middle" style="font-size:10.5px; fill:var(--accent); font-weight:600;">第2層</text>
+        <text x="108" y="102" text-anchor="middle" style="font-size:10px; fill:var(--accent);">attn+MLP</text>
+        <line x1="138" y1="90" x2="164" y2="90" stroke="var(--line)" stroke-width="1.5"/>
+        <circle cx="182" cy="90" r="16" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <text x="182" y="120" text-anchor="middle" style="font-size:10.5px; fill:var(--sub);">環 1.6</text>
+        <text x="105" y="192" text-anchor="middle" style="font-size:12px; fill:var(--ink); font-weight:600;">種を第2層が増幅する</text>
+        <text x="105" y="210" text-anchor="middle" style="font-size:11px; fill:var(--sub);">データ統計に無い · 25層凍結して運ばれる</text>
+      </g>
+      <text x="738" y="115" style="font-size:20px; fill:var(--line);">→</text>
+      <!-- ④機能 -->
+      <g transform="translate(760,18)">
+        <text x="105" y="8" text-anchor="middle" style="font-size:12px; fill:var(--accent); font-weight:600;">④ 機能検証</text>
+        <text x="105" y="80" text-anchor="middle" style="font-size:34px; font-weight:700; fill:var(--green);">90–100%</text>
+        <text x="105" y="104" text-anchor="middle" style="font-size:11.5px; fill:var(--sub);">位相ゼロのモデルの読み・韻の正答率</text>
+        <text x="105" y="130" text-anchor="middle" style="font-size:12px; fill:var(--red); font-weight:600;">= 環は能力に使われていない</text>
+        <text x="105" y="192" text-anchor="middle" style="font-size:12px; fill:var(--ink); font-weight:600;">創発するが、副産物</text>
+        <text x="105" y="210" text-anchor="middle" style="font-size:11px; fill:var(--sub);">「表現の記述は機能を含意しない」</text>
+      </g>
+    </svg>
+  </div>
 </header>
 
 <nav class="toc"><div class="toc-inner">
@@ -116,6 +178,35 @@
     <tr><td>スワップテスト：ランダム10系列の組×200の中での順位</td><td><b>99.5パーセンタイル</b></td><td><b>97.0パーセンタイル</b></td></tr>
   </table>
   <div class="callout warn">何がこの10系列を分けるのかは<b>未解明</b>。系列サイズ・漢字頻度・埋め込み凝集・音符の根の頻度 — 4因子すべて検定して棄却済み。識別因子は open question。</div>
+
+  <h3 style="font-size:19px; font-weight:600; margin:40px 0 6px;">同じ環を、別の数学の物差しで見る</h3>
+  <p class="lede">位相(PH)だけに頼らず、解析学・代数・最適輸送の独立な量でも環を測った。</p>
+  <div class="chart-card">
+    <div class="chart-title">熱緩和時間 τ = 1/λ₂ — グラフ上で熱が均一になるまでの速さ（補助指標に昇格）</div>
+    <svg viewBox="0 0 760 190">
+      <g transform="translate(120,20)">
+        <text x="-12" y="26" text-anchor="end" style="font-size:13px; fill:var(--ink);">音符</text>
+        <rect x="0" y="12" width="72" height="22" rx="4" fill="var(--green)"/>
+        <text x="80" y="28" style="font-size:13px; fill:var(--ink); font-weight:600;">3.7 — 最速。よく混ざる一体構造に、薄い穴が1つ</text>
+        <text x="-12" y="76" text-anchor="end" style="font-size:13px; fill:var(--ink);">ランダム</text>
+        <rect x="0" y="62" width="142" height="22" rx="4" fill="#b9b9c0"/>
+        <text x="150" y="78" style="font-size:13px; fill:var(--sub);">7.3 ± 2.1</text>
+        <text x="-12" y="126" text-anchor="end" style="font-size:13px; fill:var(--ink);">意味</text>
+        <rect x="0" y="112" width="551" height="22" rx="4" fill="var(--red)"/>
+        <text x="345" y="128" style="font-size:13px; fill:#fff; font-weight:600;">28.2 — 激遅。熱が意味の島々に閉じ込められる</text>
+      </g>
+    </svg>
+    <p class="chart-note">予想（環＝熱が回りにくい）の<b>真逆</b>が出た：音符グラフはエクスパンダー的によく混ざり、意味グラフは孤立クラスタ群。「凝縮なき環」（意味＝凝縮 vs 音符＝拡散＋穴）が、位相と独立な物理量でも同じ向きに分かれた。</p>
+  </div>
+  <div class="card">
+    <h4>他の物差しが教えたこと（拡張でなく精密化）</h4>
+    <p style="margin:0; font-size:15px;">
+      <b>円座標</b>（persistent cohomology, dreimac）：環上の漢字の並びは系列構造を保存しない — MDS極角・辺分析に続く3手法目。<b>環は実在するが、その並びに言語的な意味はない</b>。
+      <b>代数</b>：角度間隔CV=1.14（結晶=0）— 回転対称性の無い<b>非晶質の環</b>。
+      <b>Gromov-Wasserstein</b>：2系列の環は形としては似ていない（z=-0.4）— 一致するのは統計（強さ・種・増幅）であって計量形状ではない。
+      <b>圏論</b>（<a class="plain" href="CATEGORY_SKETCH.md">スケッチ</a>）：「自然同型ではないが、位相不変量の商に落とすと同型」— ホモロジーが同じで同相でない空間ペアのLLM版。
+    </p>
+  </div>
 </section>
 
 <section id="s3">
