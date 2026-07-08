@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>幻のトポロジー — LLM表現の「環」はどこまで本物か</title>
+<style>
+:root{
+  --paper:#fff; --plane:#f9f9f7; --surface:#fcfcfb;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --hair:rgba(11,11,11,.10);
+  --accent:#2a78d6; --s1:#2a78d6; --s2:#1baf7a; --s8:#eb6834; --green:#008300; --ctrl:#a9a7a0;
+  --crit:#d03b3b; --good:#006300; --maxw:840px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#0d0d0d; --plane:#0d0d0d; --surface:#1a1a19;
+  --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --hair:rgba(255,255,255,.10);
+  --accent:#3987e5; --s1:#3987e5; --s2:#199e70; --s8:#d95926; --green:#0ca30c; --ctrl:#6d6b64; --crit:#e06666;
+}}
+*{box-sizing:border-box} html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--plane);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;
+  font-weight:350;line-height:1.75;letter-spacing:.01em;font-feature-settings:"palt" 1;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:clamp(28px,6vw,72px) clamp(20px,5vw,40px) 96px}
+header{margin-bottom:44px}
+.kicker{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:500;margin-bottom:16px}
+h1{font-size:clamp(24px,4.2vw,34px);line-height:1.28;font-weight:600;letter-spacing:-.01em;margin:0 0 18px}
+.lede{font-size:clamp(15.5px,2.2vw,18px);color:var(--ink2);font-weight:350;margin:0 0 20px;max-width:64ch}
+.meta{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--hair);padding-top:14px}
+.meta b{font-weight:500;color:var(--ink2)}
+h2{font-size:19px;font-weight:600;margin:52px 0 4px;padding-top:22px;border-top:1px solid var(--hair)}
+h2 .n{color:var(--muted);font-weight:400;margin-right:10px;font-variant-numeric:tabular-nums}
+h3{font-size:15px;font-weight:600;margin:28px 0 8px}
+p{margin:12px 0;max-width:70ch} p.small{font-size:13.5px;color:var(--ink2)}
+strong{font-weight:600} a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--hair)}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9em;background:var(--surface);border:1px solid var(--hair);border-radius:5px;padding:1px 6px}
+ul{padding-left:1.15em;max-width:70ch} li{margin:7px 0}
+.callout{background:var(--surface);border:1px solid var(--hair);border-left:3px solid var(--accent);border-radius:10px;padding:16px 20px;margin:20px 0;font-size:14.5px}
+.callout.warn{border-left-color:var(--s8)} .callout.done{border-left-color:var(--green)} .callout.go{border-left-color:var(--accent)}
+.callout .lab{font-size:11.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;display:block;margin-bottom:6px}
+.tldr{font-size:14px;color:var(--ink2);border:1px dashed var(--hair);border-radius:9px;padding:12px 16px;margin:14px 0 4px}
+.tldr b{color:var(--ink);font-weight:600}
+figure{margin:24px 0 8px;background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:20px 20px 14px}
+figcaption{font-size:12.5px;color:var(--muted);margin-top:12px;line-height:1.6} figcaption b{color:var(--ink2);font-weight:500}
+.legend{display:flex;flex-wrap:wrap;gap:5px 16px;margin:2px 0 14px;font-size:12.5px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.sw{width:11px;height:11px;border-radius:3px;flex:0 0 auto} .sw.line{height:3px;width:16px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.tick{fill:var(--muted);font-size:10.5px;font-variant-numeric:tabular-nums} .axlab{fill:var(--muted);font-size:11px}
+.dlab{font-size:10.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.tblwrap{overflow-x:auto} table{border-collapse:collapse;width:100%;font-size:12.5px;margin:12px 0;font-variant-numeric:tabular-nums}
+th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--hair)} th:first-child,td:first-child{text-align:left;font-variant-numeric:normal}
+thead th{color:var(--muted);font-weight:500;border-bottom:1px solid var(--axis)}
+.dead{color:var(--crit);font-weight:600} .alive{color:var(--good);font-weight:600}
+.foot{margin-top:60px;padding-top:20px;border-top:1px solid var(--hair);font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">公開研究ログ · TDA × 解釈可能性 · 方法論/警鐘</div>
+  <h1>幻のトポロジー<br>——LLM表現の「環」はどこまで本物か</h1>
+  <p class="lede">大規模言語モデルの内部表現に「環（H₁ループ）」を見つけた——と思った。持続的ホモロジー(PH)の標準的な指標で、合成モデルは <strong>z ≈ +37</strong>、実LLMは z ≈ +4 の強信号。だが公平な統制を当てると<strong>ほぼ全て消えた</strong>。本ログは、PHパイプラインがLLM表現に<strong>幻の位相構造を量産する3つの経路</strong>を、正解既知の合成データと実LLMの両方で実証し、幻を殺す<strong>検証プロトコル</strong>を提示する。もっともらしい信号を、信じる前に殺す。</p>
+  <div class="meta">
+    <span><b>対象</b> 合成(豆GPT) + 実LLM 11機種</span>
+    <span><b>指標</b> 支配ループ / 幾何マッチnull / LOO / 弧解剖</span>
+    <span><b>狙い</b> 再現性・信頼性（方法論）</span>
+    <span><b>コード</b> 全公開</span>
+  </div>
+</header>
+
+<div class="callout warn">
+  <span class="lab">done と ongoing を正直に分ける</span>
+  <strong>DONE（本ログの確定結果）</strong>：私たち自身が見つけた「音符H₁環」を、合成・実LLMの両方で厳密に検証し、<strong>アーティファクトと結論</strong>。パイプラインの偽陽性経路を同定し、検出力（真の環は検出する）も確認した。<br>
+  <strong>ONGOING（未完・主張しない）</strong>：発表済みの他者のTDA×LLM位相主張を同じプロトコルで再解析する作業は<strong>進行中</strong>。本ログでは他者の結論を否定しない。対象候補の列挙に留める。
+</div>
+
+<h2><span class="n">1</span>誘惑的な「環」</h2>
+<p>漢字の音符系列（青→清晴精静…、読みを共有するが意味はバラバラ）をLLMに通し、中間層の表現に持続的ホモロジーをかけると、H₁（ループ）の<strong>total persistence</strong>が対照を大きく超えた。合成の豆GPT（正解が作れる小モデル）では読み確率を上げるほど単調に強まり <strong>ratio 15.85 / z+37</strong>、実LLM（LLM-jp 1.8B, Qwen3-1.7B等）でも <strong>z+3.9〜4.0</strong>。「言語カテゴリが表現に周期構造を作る」——魅力的な物語だった。</p>
+
+<h2><span class="n">2</span>公平な統制を当てると、消える</h2>
+<div class="tldr"><b>読み：</b>「全次元の total persistence」でなく<b>支配ループ1本を、幾何マッチnullに対して</b>測ると、合成の強信号ですら <b>z+37 → z+0.9（非有意）</b>に崩壊。実LLMも大半が有意性・頑健性検定を通らない。</div>
+<figure>
+  <div class="legend" id="lg1"></div>
+  <svg id="c1" viewBox="0 0 560 300" role="img" aria-label="汚染指標と清潔指標での環の強さ"></svg>
+  <figcaption><b>縦軸</b> 環の強さ z（合成・強信号regime）。左=旧指標（全次元total persistence）、右=clean OP（支配ループ×幾何マッチnull）。破線=有意水準の目安 z≈2。<b>清潔指標では有意性を下回る。</b></figcaption>
+</figure>
+<p class="small">実LLM 11機種の梯子（S = max_k z_k、k選択自由度をnullに内包、n_null=1000）と BH-FDR 補正：</p>
+<div class="tblwrap"><table>
+  <thead><tr><th>モデル</th><th>旧 z</th><th>S（clean）</th><th>p</th><th>FDR後(q=.10)</th></tr></thead>
+  <tbody>
+    <tr><td>q17 (Qwen3)</td><td>+4.0</td><td>+3.32</td><td>.009</td><td class="alive">生存（但しLOO脆弱）</td></tr>
+    <tr><td>18base</td><td>+3.9</td><td>+2.81</td><td>.028</td><td class="dead">落ちる</td></tr>
+    <tr><td>37base</td><td>+2.1</td><td>−0.64</td><td>.91</td><td class="dead">死亡</td></tr>
+    <tr><td>q4</td><td>+2.9</td><td>+0.43</td><td>.45</td><td class="dead">死亡</td></tr>
+    <tr><td>他6機種</td><td>—</td><td>≤+1.2</td><td>≥.21</td><td class="dead">非有意</td></tr>
+  </tbody>
+</table></div>
+<p class="small"><b>とどめ：</b>唯一残る q17 も、<b>系列を1本抜く（LOO）と S+3.32→+0.29 に崩壊</b>。さらに弧解剖（系列がループ上を弧として通るか）で、系列は環上に<b>散在</b>（角度凝集 R̄=0.295 < シャッフルnull 0.439, z=−2.1）＝「系列が描く環」ではない。</p>
+
+<h2><span class="n">3</span>これは「見落とし」でなく「不在」</h2>
+<div class="tldr"><b>読み：</b>パイプラインが鈍くて見えないのではない。<b>本物の環は（高次元でも）ちゃんと検出する</b>。だから豆GPTで出ないのは、環の<b>不在</b>を意味する。</div>
+<figure>
+  <svg id="c2" viewBox="0 0 560 280" role="img" aria-label="陽性対照: 真の環は検出する"></svg>
+  <figcaption><b>縦軸</b> 支配ループの persistence（合成データ, top-2 PCA）。真の円（低次元・ノイズ入り・<b>160次元に埋め込んだ円</b>）はすべてランダムなブロブ（破線）を大きく超える＝<b>検出力あり</b>。</figcaption>
+</figure>
+
+<h2><span class="n">4</span>幻トポロジーの3経路</h2>
+<p>旧指標の z が発火した機構を分解すると、環でない3つの由来が同定された：</p>
+<ul>
+  <li><strong>(a) クラスタ幾何</strong>：k個の意味クラスタが偽ループを生む。random-subset null 0.30 に対し、<strong>クラスタマッチnullは 0.76</strong>（2.5倍）——z の一部は自明。</li>
+  <li><strong>(b) 高次元拡散ノイズ</strong>：157次元空間のランダム点が多数の低-persistence 1-cycle を生み total persistence を膨らす。単一の実ループの寄与は total の<strong>わずか15〜23%</strong>。</li>
+  <li><strong>(c) セット選定の分散差</strong>：音符字は「系列内で意味的に無関係な同読み字」という選定基準で<strong>構築的に高分散</strong>。高分散な点集合はランダム集合より total H₁ が高い。</li>
+</ul>
+<p class="small">加えて、tier0でPCA-2dに「単一ループ」が見えたのは <code>unit-norm</code>（全点を半径1の球面に貼付）が<strong>偽環を生成</strong>していたため（mode比較で確定）。</p>
+
+<h2><span class="n">5</span>幻を殺す検証プロトコル（再利用可能）</h2>
+<ul>
+  <li><strong>支配ループOP</strong>：total persistence和でなく、top-k PCA部分空間の<strong>単一最大バー</strong>を測る（PC標準化つき）。</li>
+  <li><strong>幾何マッチnull</strong>：random-subsetでなく、同層の意味群+フィラーから<strong>クラスタ幾何を一致させた</strong>null。</li>
+  <li><strong>LOO安定性</strong>：主張の担い手（系列）を1本ずつ抜いて信号が生き残るか。</li>
+  <li><strong>弧組織性検定</strong>：主張する構造（系列）がループ上を弧として通るか（角度凝集 vs シャッフル）。</li>
+  <li><strong>陽性対照</strong>：正解既知の合成環で検出力を確認（§3）。</li>
+  <li><strong>交絡検査</strong>：実効次元・クラスタ数を null に一致させる。</li>
+</ul>
+
+<h2><span class="n">6</span>発表済み主張の再解析（進行中・結論は保留）</h2>
+<div class="callout go">
+  <span class="lab">ongoing — 以下は「調査対象の候補」であり、否定の結論ではない</span>
+  TDA×LLM で H₁ループ/持続位相を主張する発表済み研究のうち、統制（proper null・陽性対照・LOO）が手薄に見えるものを、同じプロトコルで再解析する予定。<strong>各論文の結論について、現時点で何も主張しない。</strong>
+</div>
+<div class="tblwrap"><table>
+  <thead><tr><th>論文</th><th>主張（要旨）</th><th>着目点（統制）</th></tr></thead>
+  <tbody>
+    <tr><td>Gardinazzi+ 2025 (arXiv:2410.11042, ICML)</td><td>層をまたぐ持続ホールの集団進化</td><td>明示的null手薄・陽性対照/LOO記載なし・total正規化</td></tr>
+    <tr><td>Fitz+ 2024 (arXiv:2406.05798)</td><td>隠れ状態のH₁「穿孔」</td><td>対照が合成データ中心</td></tr>
+    <tr><td>Nolte+ 2026 (arXiv:2606.19542)</td><td>訓練中の位相velocity</td><td>等方ガウスnull・LOO/陽性対照なし</td></tr>
+    <tr><td>Tymochko+ 2020 (arXiv:2011.08952)</td><td>循環論法のH₁円</td><td>delay embが本質的に円を生む・null皆無</td></tr>
+  </tbody>
+</table></div>
+<p class="small">注：最近の研究は個別ループの過剰解釈を避ける傾向があり、批判は「主張が偽」ではなく<strong>「統制がartifactと切り分けるに足りない」</strong>という方法論的なもの。demolitionではない。</p>
+
+<h2><span class="n">7</span>正直な限界</h2>
+<p class="small"><strong>残る交絡</strong>：実効次元をマッチしたnull後も z+2.6〜3.8 の残余があり、その正体（高次モーメント/意味クラスタ数）は未同定。<strong>punch の程度</strong>：分野は近年慎重化しており、本研究の貢献は「より強い統制プロトコルの提示＋再解析」で、劇的な反証ではない。<strong>再解析の依存</strong>：他者の主張の検証は公開コード/データに依存し、統制後も生存する可能性を含む（その場合は幻仮説が普遍でないと分かる＝それも結果）。</p>
+
+<div class="foot">
+  再現：<code>topology/</code>（tier0_sanity.py, topo_metric.py, ring_probe.py, validate_op.py, realllm_*.py）。全数値は実出力。
+  合成 z+37 / clean OP z+0.9 / 実LLM梯子・LOO・弧解剖・陽性対照はすべて公開スクリプトで再現可能。
+</div>
+</div>
+
+<script>
+const D={
+ collapse:[{name:'旧指標 (total persistence)',vals:[37]},{name:'clean OP (支配ループ)',vals:[0.9]}],
+ sigline:2,
+ posctrl:[{name:'円 10点',v:1.82},{name:'円 40点+ノイズ',v:1.28},{name:'160次元に埋込んだ円',v:1.79},{name:'ランダムblob',v:0.64}],
+ blob:0.64
+};
+const cv=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+const NS="http://www.w3.org/2000/svg";
+const el=(n,a={})=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const txt=(x,y,s,cls,anc="middle",ex={})=>{const t=el("text",{x,y,"text-anchor":anc,class:cls,...ex});t.textContent=s;return t;};
+function legend(id,items){const c=document.getElementById(id);if(!c)return;items.forEach(([lab,col,line])=>{const s=document.createElement("span");
+  const b=document.createElement("i");b.className="sw"+(line?" line":"");b.style.background=cv(col);s.appendChild(b);s.appendChild(document.createTextNode(lab));c.appendChild(s);});}
+
+// 図1: 崩壊 (z軸 0-40, 有意線 z=2)
+(function(){
+  const W=560,H=300,L=48,R=20,T=18,B=54,x0=L,x1=W-R,y0=H-B,y1=T,YM=40;
+  const svg=document.getElementById('c1');const ys=v=>y0+(v/YM)*(y1-y0);
+  [0,10,20,30,40].forEach(g=>{svg.appendChild(el("line",{x1:x0,x2:x1,y1:ys(g),y2:ys(g),stroke:cv("--grid"),"stroke-width":1}));svg.appendChild(txt(x0-8,ys(g)+3,g,"tick","end"));});
+  // 有意線
+  svg.appendChild(el("line",{x1:x0,x2:x1,y1:ys(D.sigline),y2:ys(D.sigline),stroke:cv("--crit"),"stroke-width":1.4,"stroke-dasharray":"3 3"}));
+  svg.appendChild(txt(x1,ys(D.sigline)-4,"有意水準 z≈2","tick","end",{fill:cv("--crit")}));
+  const cols=[cv("--s8"),cv("--green")];const bw=90,gap=(x1-x0-bw*2)/3;
+  D.collapse.forEach((g,i)=>{const v=g.vals[0];const bx=x0+gap+(bw+gap)*i;
+    svg.appendChild(el("rect",{x:bx,y:ys(v),width:bw,height:y0-ys(v),rx:4,fill:cols[i]}));
+    svg.appendChild(txt(bx+bw/2,ys(v)-8,(i?"+0.9 (ns)":"+37"),"dlab",'middle',{fill:cols[i]}));
+    svg.appendChild(txt(bx+bw/2,y0+18,g.name.length>14?g.name.slice(0,14):g.name,"axlab"));
+    svg.appendChild(txt(bx+bw/2,y0+33,i?"(支配ループ×幾何null)":"(全次元total)","tick"));
+  });
+})();
+// 図2: 陽性対照 (0-2, blob破線)
+(function(){
+  const W=560,H=280,L=48,R=20,T=18,B=56,x0=L,x1=W-R,y0=H-B,y1=T,YM=2;
+  const svg=document.getElementById('c2');const ys=v=>y0+(v/YM)*(y1-y0);
+  [0,0.5,1,1.5,2].forEach(g=>{svg.appendChild(el("line",{x1:x0,x2:x1,y1:ys(g),y2:ys(g),stroke:cv("--grid"),"stroke-width":1}));svg.appendChild(txt(x0-8,ys(g)+3,g.toFixed(1),"tick","end"));});
+  svg.appendChild(el("line",{x1:x0,x2:x1,y1:ys(D.blob),y2:ys(D.blob),stroke:cv("--ctrl"),"stroke-width":1.4,"stroke-dasharray":"3 3"}));
+  svg.appendChild(txt(x1,ys(D.blob)-4,"ブロブ床 0.64","tick","end",{fill:cv("--muted")}));
+  const n=D.posctrl.length,bw=Math.min(72,(x1-x0)/n-24),step=(x1-x0)/n;
+  D.posctrl.forEach((d,i)=>{const bx=x0+step*i+(step-bw)/2;const isBlob=d.v===D.blob;
+    svg.appendChild(el("rect",{x:bx,y:ys(d.v),width:bw,height:y0-ys(d.v),rx:4,fill:isBlob?cv("--ctrl"):cv("--s1")}));
+    svg.appendChild(txt(bx+bw/2,ys(d.v)-8,d.v.toFixed(2),"dlab",'middle',{fill:isBlob?cv("--muted"):cv("--s1")}));
+    d.name.split(' ').forEach((w,k)=>svg.appendChild(txt(bx+bw/2,y0+16+k*13,w,"tick")));
+  });
+})();
+legend('lg1',[['旧指標=アーティファクト','--s8'],['clean OP=非有意','--green']]);
+</script>
+</body>
+</html>
