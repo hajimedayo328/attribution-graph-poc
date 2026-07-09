@@ -126,7 +126,15 @@ thead th{color:var(--muted);font-weight:500;border-bottom:1px solid var(--axis)}
   <li><strong>交絡検査</strong>：実効次元・クラスタ数を null に一致させる。</li>
 </ul>
 
-<h2><span class="n">6</span>発表済み主張の再解析（進行中・結論は保留）</h2>
+<h2><span class="n">6</span>汎用 layer reps でも同じ（発表済み研究の設定で検証）</h2>
+<div class="tldr"><b>読み：</b>発表済み研究が使うのと同型の「層ごとの表現点群」に、同じ較正プロトコル（支配ループ×cluster-matched null＋FDR＋LOO）を当てた（Pythia-410m / GPT-2-large）。<b>支配ループの大きさは真の環の約6%で無視でき</b>、しかも<b>"有意な個数"はクラスタ粒度 k で 0〜11 に激変</b>＝位相の"個数"は well-defined でない。</div>
+<figure>
+  <svg id="ck" viewBox="0 0 560 250" role="img" aria-label="FDR+LOO生存層数のk依存性"></svg>
+  <figcaption><b>縦軸</b> 較正＋FDR＋LOO を通過した層数（Pythia-410m, 全24層）／<b>横軸</b> クラスタ数 k。同じデータでも k で 0〜11 に激変。一方<b>支配ループの大きさ（max obs）は全 k で 0.13 前後＝真の埋込円 ~2.0 の約6%</b>で一定＝無視できる。GPT-2-large(36層)でも同型（k=12で2層・極小）。</figcaption>
+</figure>
+<p class="small">＝弱い手法（null無し・LOO無し）なら「多くの層に位相/フェーズ」を報告するが、較正すると<strong>大きさは無視でき・個数は方法論選択に支配される</strong>。<strong>皮肉だが、この k 脆弱性は我々自身の解析にも起きた</strong>——それこそが本ログの主張（位相主張は方法論に脆い）の生きた実例。<b>LOO がキー統制</b>：GPT-2 では FDR が 28/36 層を残すが、LOO が単一クラスタ依存の脆いループを叩き 2 層まで落とす。</p>
+
+<h2><span class="n">7</span>発表済み主張の再解析（進行中・結論は保留）</h2>
 <div class="callout go">
   <span class="lab">ongoing — 以下は「調査対象の候補」であり、否定の結論ではない</span>
   TDA×LLM で H₁ループ/持続位相を主張する発表済み研究のうち、統制（proper null・陽性対照・LOO）が手薄に見えるものを、同じプロトコルで再解析する予定。<strong>各論文の結論について、現時点で何も主張しない。</strong>
@@ -142,7 +150,7 @@ thead th{color:var(--muted);font-weight:500;border-bottom:1px solid var(--axis)}
 </table></div>
 <p class="small">注：最近の研究は個別ループの過剰解釈を避ける傾向があり、批判は「主張が偽」ではなく<strong>「統制がartifactと切り分けるに足りない」</strong>という方法論的なもの。demolitionではない。</p>
 
-<h2><span class="n">7</span>正直な限界</h2>
+<h2><span class="n">8</span>正直な限界</h2>
 <p class="small"><strong>残る交絡</strong>：実効次元をマッチしたnull後も z+2.6〜3.8 の残余があり、その正体（高次モーメント/意味クラスタ数）は未同定。<strong>punch の程度</strong>：分野は近年慎重化しており、本研究の貢献は「より強い統制プロトコルの提示＋再解析」で、劇的な反証ではない。<strong>再解析の依存</strong>：他者の主張の検証は公開コード/データに依存し、統制後も生存する可能性を含む（その場合は幻仮説が普遍でないと分かる＝それも結果）。</p>
 
 <div class="foot">
@@ -156,7 +164,8 @@ const D={
  collapse:[{name:'旧指標 (total persistence)',vals:[37]},{name:'clean OP (支配ループ)',vals:[0.9]}],
  sigline:2,
  posctrl:[{name:'円 10点',v:1.82},{name:'円 40点+ノイズ',v:1.28},{name:'160次元に埋込んだ円',v:1.79},{name:'ランダムblob',v:0.64}],
- blob:0.64
+ blob:0.64,
+ ksweep:[{k:8,s:11},{k:12,s:2},{k:16,s:0},{k:24,s:0}]
 };
 const cv=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
 const NS="http://www.w3.org/2000/svg";
@@ -196,6 +205,18 @@ function legend(id,items){const c=document.getElementById(id);if(!c)return;items
   });
 })();
 legend('lg1',[['旧指標=アーティファクト','--s8'],['clean OP=非有意','--green']]);
+// 図: k依存性(生存層数)
+(function(){
+  const W=560,H=250,L=48,R=20,T=18,B=52,x0=L,x1=W-R,y0=H-B,y1=T,YM=12;
+  const svg=document.getElementById('ck');if(!svg)return;const ys=v=>y0+(v/YM)*(y1-y0);
+  [0,3,6,9,12].forEach(g=>{svg.appendChild(el("line",{x1:x0,x2:x1,y1:ys(g),y2:ys(g),stroke:cv("--grid"),"stroke-width":1}));svg.appendChild(txt(x0-8,ys(g)+3,g,"tick","end"));});
+  const n=D.ksweep.length,bw=Math.min(70,(x1-x0)/n-30),step=(x1-x0)/n;
+  D.ksweep.forEach((d,i)=>{const bx=x0+step*i+(step-bw)/2;const h=y0-ys(d.s);
+    svg.appendChild(el("rect",{x:bx,y:ys(d.s),width:bw,height:Math.max(h,1.5),rx:4,fill:d.s>=3?cv("--s8"):cv("--ctrl")}));
+    svg.appendChild(txt(bx+bw/2,ys(d.s)-8,d.s,"dlab",'middle',{fill:d.s>=3?cv("--s8"):cv("--muted")}));
+    svg.appendChild(txt(bx+bw/2,y0+18,"k="+d.k,"axlab"));});
+  svg.appendChild(txt((x0+x1)/2,H-4,"同じデータ・同じ大きさ(max obs≈真の環の6%)なのに、生存層数はkで0〜11に激変",'tick'));
+})();
 </script>
 </body>
 </html>
